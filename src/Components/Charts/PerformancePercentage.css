@@ -1,0 +1,18 @@
+.avatar {
+  font-size: 28px;
+}
+
+.blue-bold {
+  color: blue;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.gray-text {
+  color: gray;
+}
+
+/* Add additional spacing between the sets */
+.flex-container > * {
+  margin-right: 20px;
+}

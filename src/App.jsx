@@ -1,21 +1,29 @@
 import AdminDashboard from "./Components/Admin/AdminDashboard";
-import Employee from "./Components/Employee/Employee";
+import Charts from "./Components/Admin/Charts";
 import Login from "./Auth/Login";
-import Register from "./Auth/Register";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./Auth/ProtectedRoute";
+import { Route, Routes } from "react-router-dom";
+import { AuthContextProvider } from "./Context/AuthContext";
 
 function App() {
   return (
     <>
-      <BrowserRouter>
-
+      <AuthContextProvider>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/employee" element={<Employee />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path='/' element={<Login />} />
+          <Route
+            path='/dashboard'
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+
+          />
+          <Route path="/charts" element={<ProtectedRoute><Charts /></ProtectedRoute>} />
+
         </Routes>
-      </BrowserRouter>
+      </AuthContextProvider>
     </>
   );
 }

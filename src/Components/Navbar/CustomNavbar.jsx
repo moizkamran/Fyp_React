@@ -3,12 +3,14 @@ import { AppShell, Header, Navbar } from "@mantine/core";
 import { signOut } from "firebase/auth";
 import { useState } from "react";
 import { FaCog, FaHome, FaUser, FaUserCircle } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../Firebase/Firebase";
 
 const CustomNavbar = () => {
     document.body.style.overflow = "hidden";
     const navigate = useNavigate(); // Add useNavigate hook to access the navigation function
+
+
 
     const handleLogout = () => {
         signOut(auth)
@@ -73,8 +75,9 @@ const CustomNavbar = () => {
                                 <FaHome size={24} color="white" />
                             </li>
                             <li style={{ marginBottom: 16 }}>
-                                <FaUser size={24} color="white" />
-                            </li>
+                                <Link to="/charts">
+                                    <FaUser size={24} color="white" />
+                                </Link>                            </li>
                             <li style={{ marginBottom: 16 }}>
                                 <FaCog size={24} color="white" />
                             </li>
