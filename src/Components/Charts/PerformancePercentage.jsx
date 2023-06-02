@@ -7,9 +7,13 @@ const PerformancePercentage = () => {
             <Center>
                 <Paper
                     shadow="sm"
-                    style={{ width: "900px", height: "160px", marginBottom: "20px", padding: "20px" }}
+                    style={{
+                        width: "auto",
+                        marginBottom: "20px",
+                        padding: "20px",
+                    }}
                 >
-                    <Flex justifyContent="space-between" alignItems="center" gap="lg">
+                    <Flex justifyContent="space-around" alignItems="center" gap="lg">
                         <Flex>
                             <Avatar
                                 color="cyan"
@@ -21,7 +25,14 @@ const PerformancePercentage = () => {
                             </Avatar>
                             <Flex direction="column">
                                 <Text>Improve Coprates Performance</Text>
-                                <Text style={{ color: "blue", fontWeight: "bold", fontSize: "20px", marginTop: "4px" }}>
+                                <Text
+                                    style={{
+                                        color: "blue",
+                                        fontWeight: "bold",
+                                        fontSize: "20px",
+                                        marginTop: "4px",
+                                    }}
+                                >
                                     70% /month
                                 </Text>
                             </Flex>
@@ -38,7 +49,14 @@ const PerformancePercentage = () => {
                             </Avatar>
                             <Flex direction="column">
                                 <Text style={{ color: "gray" }}>Employee Productivity</Text>
-                                <Text style={{ color: "blue", fontWeight: "bold", fontSize: "20px", marginTop: "4px" }}>
+                                <Text
+                                    style={{
+                                        color: "blue",
+                                        fontWeight: "bold",
+                                        fontSize: "20px",
+                                        marginTop: "4px",
+                                    }}
+                                >
                                     70% /month
                                 </Text>
                             </Flex>
@@ -55,7 +73,14 @@ const PerformancePercentage = () => {
                             </Avatar>
                             <Flex direction="column">
                                 <Text style={{ color: "gray" }}>Project Achievement</Text>
-                                <Text style={{ color: "blue", fontWeight: "bold", fontSize: "20px", marginTop: "4px" }}>
+                                <Text
+                                    style={{
+                                        color: "blue",
+                                        fontWeight: "bold",
+                                        fontSize: "20px",
+                                        marginTop: "4px",
+                                    }}
+                                >
                                     70% /Project/month
                                 </Text>
                             </Flex>
@@ -72,7 +97,14 @@ const PerformancePercentage = () => {
                             </Avatar>
                             <Flex direction="column">
                                 <Text style={{ color: "gray" }}>Key Performance Indicator</Text>
-                                <Text style={{ color: "blue", fontWeight: "bold", fontSize: "20px", marginTop: "4px" }}>
+                                <Text
+                                    style={{
+                                        color: "blue",
+                                        fontWeight: "bold",
+                                        fontSize: "20px",
+                                        marginTop: "4px",
+                                    }}
+                                >
                                     70% /Quatar
                                 </Text>
                             </Flex>

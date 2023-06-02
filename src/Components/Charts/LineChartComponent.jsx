@@ -17,32 +17,60 @@ const LineChartComponent = () => {
         <div>
             <PerformancePercentage />
             <Center>
-                <Flex>
-                    <Paper elevation={3} style={{ padding: 20, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)", marginBottom: 20 }}>
-                        <h2>Line Chart</h2>
-                        <LineChart width={400} height={300} data={data}>
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="value" stroke="#007bff" strokeWidth={3} />
-                        </LineChart>
-                    </Paper>
-                    <Paper elevation={3} style={{ padding: 20, boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)", marginBottom: 20 }}>
-                        <h2>Line Chart</h2>
-                        <LineChart width={400} height={300} data={data}>
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="value" stroke="#007bff" strokeWidth={3} />
-                        </LineChart>
-                    </Paper>
+                <Flex
+                    mt={10}
+                >
+                    <Paper
+                        mr={100}
+                        elevation={3}
+                        style={{
 
-                </Flex> </Center>
-        </div >
+                            padding: 20,
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                            marginBottom: 20,
+                        }}
+                    >
+                        <h2>Line Chart</h2>
+                        <LineChart width={800} height={400} data={data}>
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+                            <Tooltip />
+                            <Legend />
+                            <Line
+                                type="monotone"
+                                dataKey="value"
+                                stroke="#007bff"
+                                strokeWidth={3}
+                            />
+                        </LineChart>
+                    </Paper>
+                    <Paper
+                        elevation={3}
+                        style={{
+                            padding: 20,
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                            marginBottom: 20,
+                        }}
+                    >
+                        <h2>Line Chart</h2>
+                        <LineChart width={800} height={400} data={data}>
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+                            <Tooltip />
+                            <Legend />
+                            <Line
+                                type="monotone"
+                                dataKey="value"
+                                stroke="#007bff"
+                                strokeWidth={3}
+                            />
+                        </LineChart>
+                    </Paper>
+                </Flex>
+            </Center>
+        </div>
     );
 };
 
