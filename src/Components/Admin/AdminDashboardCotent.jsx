@@ -1,24 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Center, Flex, Menu, Table, TextInput } from "@mantine/core";
-import { IconExternalLink } from "@tabler/icons-react";
+import { off, onValue, push, ref } from "firebase/database";
 import { FaSearch } from "react-icons/fa";
+import { database } from "../../Firebase/Firebase";
 
-function AdminDashboardContent() {
-    const [userData, setUserData] = useState([
-        { email: 'user1@example.com', name: 'John Doe', status: 'Active', permission: 'Operational' },
-        // Additional user data can be added here
-    ]);
+const AdminDashboardContent = () => {
+    const [userData, setUserData] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredUserData, setFilteredUserData] = useState([]);
 
-    const rowsPerPage = 8;
+    useEffect(() => {
+        const usersRef = ref(database, "Admin/users");
+
+        const fetchData = () => {
+            onValue(usersRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const userList = Object.values(data);
+                    setUserData(userList);
+                }
+            });
+        };
+
+        fetchData();
+
+        // Clean up the listener when the component unmounts
+        return () => {
+            // Detach the event listener
+            off(usersRef);
+        };
+    }, []);
+
+    const rowsPerPage = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [newUserData, setNewUserData] = useState({
-        email: '',
-        name: '',
-        permission: '',
+        email: "",
+        name: "",
+        permission: "",
     });
 
-    const totalRows = userData.length;
+    const totalRows = filteredUserData.length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
 
     const handlePageChange = (pageNumber) => {
@@ -29,7 +51,7 @@ function AdminDashboardContent() {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleInputChange = (event) => {
+    const handleMenuInputChange = (event) => {
         const { name, value } = event.target;
         setNewUserData((prevData) => ({
             ...prevData,
@@ -37,14 +59,84 @@ function AdminDashboardContent() {
         }));
     };
 
+    const handleEditInputChange = (event, index) => {
+        const { name, value } = event.target;
+        const updatedUserData = [...userData];
+        updatedUserData[index][name] = value;
+        setUserData(updatedUserData);
+    };
+
     const handleSaveUser = () => {
-        setUserData((prevData) => [...prevData, newUserData]);
-        setNewUserData({
-            email: '',
-            name: '',
-            permission: '',
-        });
-        setIsMenuOpen(false);
+        const usersRef = ref(database, "Admin/users");
+
+        const newUser = {
+            email: newUserData.email,
+            name: newUserData.name,
+            permission: newUserData.permission,
+        };
+
+        push(usersRef, newUser)
+            .then(() => {
+                console.log("User saved:", newUser);
+                setUserData((prevData) => [...prevData, newUser]);
+                setNewUserData({
+                    email: "",
+                    name: "",
+                    permission: "",
+                });
+                setIsMenuOpen(false);
+            })
+            .catch((error) => {
+                console.error("Error saving user:", error);
+            });
+    };
+
+    const handleSearchInputChange = (event) => {
+        const { value } = event.target;
+        setSearchQuery(value);
+    };
+
+    useEffect(() => {
+        const filteredData = userData.filter((user) =>
+            user.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredUserData(filteredData);
+    }, [searchQuery, userData]);
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const displayedRows = filteredUserData.slice(startIndex, endIndex);
+    const [editRowIndex, setEditRowIndex] = useState(-1);
+
+    const handleEditButtonClick = (index) => {
+        setEditRowIndex(index);
+    };
+
+    const handleSaveButtonClick = (index) => {
+        const updatedUser = { ...displayedRows[index] };
+
+        const userChangesRef = ref(database, 'Admin/userchanges');
+
+        push(userChangesRef, updatedUser)
+            .then((newUserRef) => {
+                const newUserId = newUserRef.key;
+                updatedUser.userId = newUserId;
+
+                console.log('User saved:', updatedUser);
+
+                const updatedUserData = [...userData];
+                updatedUserData.splice(startIndex + index + 1, 0, updatedUser);
+                setUserData(updatedUserData);
+                setEditRowIndex(-1);
+            })
+            .catch((error) => {
+                console.error('Error saving user:', error);
+            });
+    };
+
+
+    const handleCancelEditButtonClick = () => {
+        setEditRowIndex(-1);
     };
 
     const renderPageNumbers = () => {
@@ -52,7 +144,12 @@ function AdminDashboardContent() {
 
         for (let i = 1; i <= totalPages; i++) {
             pageNumbers.push(
-                <Button key={i} onClick={() => handlePageChange(i)} disabled={i === currentPage}>
+                <Button
+                    key={i}
+                    onClick={() => handlePageChange(i)}
+                    disabled={i === currentPage}
+                    style={{ margin: "0 0.25rem" }} // Add margin to create space between buttons
+                >
                     {i}
                 </Button>
             );
@@ -61,83 +158,28 @@ function AdminDashboardContent() {
         return pageNumbers;
     };
 
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const displayedRows = userData.slice(startIndex, endIndex);
-
     return (
-        <div>
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginBottom: '1rem',
-                    alignItems: 'center',
-                }}
-            >
+        <>
+            <div>
                 <h1>User's List</h1>
-            </div>
-            <Flex>
+                <Flex>
+                    <TextInput
+                        placeholder="Search User Name"
+                        icon={<FaSearch />}
+                        style={{ marginRight: "1rem", flex: "1" }}
+                        value={searchQuery}
+                        onChange={handleSearchInputChange}
+                    />
+                    <Button onClick={handleSaveUser}>Search</Button>
 
-                <TextInput
-                    placeholder="Search User Name"
-                    icon={<FaSearch />}
-                    style={{ marginRight: "1rem", flex: "1" }}
-                />
-
-
-                <Button>Search</Button>
-                <Menu
-                    width={300}
-                    shadow="md"
-                    opened={isMenuOpen}
-                    onClose={() => setIsMenuOpen(false)}
-                    style={{ marginBottom: '1rem' }}
-                >
-                    <Menu.Target>
-                        <Button ml={30} size="sm" onClick={handleMenuToggle}>
-                            Add User
-                        </Button>
-                    </Menu.Target>
-
-                    <Menu.Dropdown style={{ padding: '1rem' }}>
-                        <h2 style={{ marginBottom: '1rem' }}>Add User</h2>
-                        <TextInput
-                            label="Name"
-                            size="lg"
-                            style={{ marginBottom: '0.5rem' }}
-                            value={newUserData.name}
-                            name="name"
-                            onChange={handleInputChange}
-                        />
-                        <TextInput
-                            label="Email"
-                            size="lg"
-                            style={{ marginBottom: '0.5rem' }}
-                            value={newUserData.email}
-                            name="email"
-                            onChange={handleInputChange}
-                        />
-                        <TextInput
-                            label="Permission"
-                            size="lg"
-                            style={{ marginBottom: '0.5rem' }}
-                            value={newUserData.permission}
-                            name="permission"
-                            onChange={handleInputChange}
-                        />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                            <Button size="sm" style={{ marginRight: '0.5rem' }} onClick={() => setIsMenuOpen(false)}>
-                                Cancel
-                            </Button>
-                            <Button size="sm" onClick={handleSaveUser}>
-                                Save
-                            </Button>
-                        </div>
-                    </Menu.Dropdown>
-                </Menu>
-            </Flex>
-            <Center>
+                    <AdminMenuComponent
+                        isMenuOpen={isMenuOpen}
+                        handleMenuToggle={handleMenuToggle}
+                        handleInputChange={handleMenuInputChange}
+                        handleSaveUser={handleSaveUser}
+                        newUserData={newUserData}
+                    />
+                </Flex>
                 <Table>
                     <thead>
                         <tr>
@@ -149,23 +191,150 @@ function AdminDashboardContent() {
                     <tbody>
                         {displayedRows.map((row, index) => (
                             <tr key={index}>
-                                <td>{row.email}</td>
-                                <td>{row.name}</td>
-                                <td>{row.permission}</td>
                                 <td>
-                                    <Button size="sm">Edit</Button>
+                                    {editRowIndex === index ? (
+                                        <input
+                                            type="text"
+                                            name="email"
+                                            value={row.email}
+                                            onChange={(event) => handleEditInputChange(event, index)}
+                                        />
+                                    ) : (
+                                        row.email
+                                    )}
+                                </td>
+                                <td>
+                                    {editRowIndex === index ? (
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={row.name}
+                                            onChange={(event) => handleEditInputChange(event, index)}
+                                        />
+                                    ) : (
+                                        row.name
+                                    )}
+                                </td>
+                                <td>
+                                    {editRowIndex === index ? (
+                                        <input
+                                            type="text"
+                                            name="permission"
+                                            value={row.permission}
+                                            onChange={(event) => handleEditInputChange(event, index)}
+                                        />
+                                    ) : (
+                                        row.permission
+                                    )}
+                                </td>
+                                <td>
+                                    {editRowIndex === index ? (
+                                        <>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleSaveButtonClick(index)}
+                                            >
+                                                Save
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => handleCancelEditButtonClick()}
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button
+                                            size="sm"
+                                            onClick={() => handleEditButtonClick(index)}
+                                        >
+                                            Edit
+                                        </Button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </Table>
-            </Center>
+            </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '1rem' }}>
+            <div
+                style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}
+            >
                 {renderPageNumbers()}
             </div>
-        </div>
+        </>
     );
-}
+};
+
+export const AdminMenuComponent = ({
+    isMenuOpen,
+    handleMenuToggle,
+    handleInputChange,
+    handleSaveUser,
+    newUserData,
+}) => {
+    return (
+        <Menu
+            width={300}
+            shadow="md"
+            opened={isMenuOpen}
+            onClose={() => setIsMenuOpen(false)}
+            style={{ marginBottom: "1rem" }}
+        >
+            <Menu.Target>
+                <Button ml={30} size="sm" onClick={handleMenuToggle}>
+                    Add User
+                </Button>
+            </Menu.Target>
+
+            <Menu.Dropdown style={{ padding: "1rem" }}>
+                <h2 style={{ marginBottom: "1rem" }}>Add User</h2>
+                <TextInput
+                    label="Name"
+                    size="lg"
+                    style={{ marginBottom: "0.5rem" }}
+                    value={newUserData.name}
+                    name="name"
+                    onChange={handleInputChange}
+                />
+                <TextInput
+                    label="Email"
+                    size="lg"
+                    style={{ marginBottom: "0.5rem" }}
+                    value={newUserData.email}
+                    name="email"
+                    onChange={handleInputChange}
+                />
+                <TextInput
+                    label="Permission"
+                    size="lg"
+                    style={{ marginBottom: "0.5rem" }}
+                    value={newUserData.permission}
+                    name="permission"
+                    onChange={handleInputChange}
+                />
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        marginTop: "1rem",
+                    }}
+                >
+                    <Button
+                        size="sm"
+                        style={{ marginRight: "0.5rem" }}
+                        onClick={() => setIsMenuOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+                    <Button size="sm" onClick={handleSaveUser}>
+                        Save
+                    </Button>
+                </div>
+            </Menu.Dropdown>
+        </Menu>
+    );
+};
 
 export default AdminDashboardContent;

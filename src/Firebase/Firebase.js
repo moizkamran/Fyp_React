@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
 
 // Import the functions you need from the SDKs you need
 // TODO: Add SDKs for Firebase products that you want to use
@@ -8,17 +9,27 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyD3OZatZ912h24Q8iLFYcYpSbxYzr23MTE",
-  authDomain: "test-41534.firebaseapp.com",
-  databaseURL: "https://test-41534-default-rtdb.firebaseio.com",
-  projectId: "test-41534",
-  storageBucket: "test-41534.appspot.com",
-  messagingSenderId: "746178614657",
-  appId: "1:746178614657:web:ff1679c77b3eefe8bac480",
-  measurementId: "G-2XPG8WXJJ3",
+  apiKey: "AIzaSyAMUnogsGeC0UMAD5kMjsdAMe45hD93C7c",
+
+  authDomain: "fyp-project-396a0.firebaseapp.com",
+
+  databaseURL: "https://fyp-project-396a0-default-rtdb.firebaseio.com",
+
+  projectId: "fyp-project-396a0",
+
+  storageBucket: "fyp-project-396a0.appspot.com",
+
+  messagingSenderId: "728459220050",
+
+  appId: "1:728459220050:web:06a6bfa6115108ab4b7b8b",
+
+  measurementId: "G-RVLD7WE2Z8",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+const database = getDatabase(app);
+
 export default app;
+export { database };
