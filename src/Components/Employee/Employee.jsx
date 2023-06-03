@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Link, Route } from "react-router-dom";
 
 const Employee = () => {
     return (
-        <div></div>
+        <div>EMp page</div>
 
     )
 }

@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../Firebase/Firebase";
-
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -17,8 +16,13 @@ export const AuthContextProvider = ({ children }) => {
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const signIn = (email, password) => {
-    return signInWithEmailAndPassword(auth, email, password);
+  const signIn = (email, password, role) => {
+    return signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        user.role = role; // Set the role property for the user
+        setUser(user);
+      });
   };
 
   const logout = () => {
