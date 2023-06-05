@@ -11,19 +11,22 @@ const UserContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState({});
+  const [pending, setPending] = useState(true);
 
   const createUser = (email, password) => {
     return createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const signIn = (email, password, role) => {
-    return signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        user.role = role; // Set the role property for the user
-        setUser(user);
-      });
+  const signIn = async (email, password, role) => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    user.role = role; // Set the role property for the user
+    setUser(user);
+  
+    // Save the role in localStorage
+    localStorage.setItem('userRole', role);
   };
+  
 
   const logout = () => {
     return signOut(auth);
@@ -31,13 +34,17 @@ export const AuthContextProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log(currentUser);
       setUser(currentUser);
+      setPending(false);
     });
     return () => {
       unsubscribe();
     };
   }, []);
+
+  if (pending) {
+    return <>Loading...</>;
+  }
 
   return (
     <UserContext.Provider value={{ createUser, user, logout, signIn }}>
