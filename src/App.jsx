@@ -1,4 +1,5 @@
 import AdminDashboard from "./Components/Admin/AdminDashboard";
+import AdminPerformance from "./Components/Admin/AdminPerformance";
 import Charts from "./Components/Admin/Charts";
 import Employee from "./Components/Employee/Employee";
 import EmployeeProfileSetting from "./Components/Employee/EmployeeProfileSetting";
@@ -26,6 +27,14 @@ function App() {
           element={
             <ProtectedRoute roles={["admin"]}>
               <Charts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/adminperformance"
+          element={
+            <ProtectedRoute roles={["admin"]}>
+              <AdminPerformance />
             </ProtectedRoute>
           }
         />
