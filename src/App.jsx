@@ -1,11 +1,12 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import { AuthContextProvider } from "./Context/AuthContext";
-import ProtectedRoute from "./Auth/ProtectedRoute";
 import AdminDashboard from "./Components/Admin/AdminDashboard";
 import Charts from "./Components/Admin/Charts";
-import Login from "./Auth/Login";
 import Employee from "./Components/Employee/Employee";
+import EmployeeProfileSetting from "./Components/Employee/EmployeeProfileSetting";
+import Login from "./Auth/Login";
+import ProtectedRoute from "./Auth/ProtectedRoute";
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import { AuthContextProvider } from "./Context/AuthContext";
 
 function App() {
   return (
@@ -33,6 +34,14 @@ function App() {
           element={
             <ProtectedRoute roles={["employee"]}>
               <Employee />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ProfileSetting"
+          element={
+            <ProtectedRoute roles={["employee"]}>
+              <EmployeeProfileSetting />
             </ProtectedRoute>
           }
         />

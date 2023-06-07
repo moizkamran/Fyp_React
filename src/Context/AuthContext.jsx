@@ -23,12 +23,15 @@ export const AuthContextProvider = ({ children }) => {
     user.role = role; // Set the role property for the user
     setUser(user);
   
-    // Save the role in localStorage
+    // Save the role and user in localStorage
     localStorage.setItem('userRole', role);
+    localStorage.setItem('user', JSON.stringify(user));
   };
-  
 
   const logout = () => {
+    // Remove the role and user from localStorage
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('user');
     return signOut(auth);
   };
 

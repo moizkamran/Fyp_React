@@ -3,10 +3,11 @@ import { Navigate } from "react-router-dom";
 import { UserAuth } from "../Context/AuthContext";
 import LoggedInButError from "./LoggedInButError";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, roles }) => {
   const { user } = UserAuth();
   const userRole = localStorage.getItem('userRole');
-  if (user && userRole) {
+  
+  if (user && userRole && roles.includes(userRole)) {
     return children; // Render the protected routes
   } else if (user && userRole === "admin") {
     return <Navigate to="/dashboard" />; // Redirect to admin dashboard if the user is an admin
@@ -18,5 +19,6 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/" />; // Redirect to login page if the user is not authenticated
   }
 };
+
 
 export default ProtectedRoute;
