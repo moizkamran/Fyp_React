@@ -16,7 +16,7 @@
     "@mantine/form": "^6.0.13",
     "@mantine/hooks": "^6.0.13",
     "@tabler/icons-react": "^2.21.0",
-    "dayjs": "^1.11.7",
+    "dayjs": "^1.11.8",
     "firebase": "^9.22.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

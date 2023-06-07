@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Center, Flex, Menu, Table, TextInput } from "@mantine/core";
+import { Button, Center, Flex, Menu, Table, TextInput, Title } from "@mantine/core";
 import { off, onValue, push, ref } from "firebase/database";
 import { FaSearch } from "react-icons/fa";
 import { database } from "../../Firebase/Firebase";
@@ -10,7 +10,7 @@ const AdminDashboardContent = () => {
     const [filteredUserData, setFilteredUserData] = useState([]);
 
     useEffect(() => {
-        const usersRef = ref(database, "Admin/users");
+        const usersRef = ref(database, "Employees/Profile");
 
         const fetchData = () => {
             onValue(usersRef, (snapshot) => {
@@ -67,7 +67,7 @@ const AdminDashboardContent = () => {
     };
 
     const handleSaveUser = () => {
-        const usersRef = ref(database, "Admin/users");
+        const usersRef = ref(database, "Employees/Data");
 
         const newUser = {
             email: newUserData.email,
@@ -98,10 +98,11 @@ const AdminDashboardContent = () => {
 
     useEffect(() => {
         const filteredData = userData.filter((user) =>
-            user.name.toLowerCase().includes(searchQuery.toLowerCase())
+            user && user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredUserData(filteredData);
     }, [searchQuery, userData]);
+
 
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -115,7 +116,7 @@ const AdminDashboardContent = () => {
     const handleSaveButtonClick = (index) => {
         const updatedUser = { ...displayedRows[index] };
 
-        const userChangesRef = ref(database, 'Admin/userchanges');
+        const userChangesRef = ref(database, 'Employees/ChangedData');
 
         push(userChangesRef, updatedUser)
             .then((newUserRef) => {
@@ -161,7 +162,7 @@ const AdminDashboardContent = () => {
     return (
         <>
             <div>
-                <h1>User's List</h1>
+                <Title>Employees List</Title>
                 <Flex>
                     <TextInput
                         placeholder="Search User Name"

@@ -4,6 +4,7 @@ import { signOut } from "firebase/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../Firebase/Firebase";
+import { UserAuth } from "../../Context/AuthContext";
 
 import {
     IconHome2,
@@ -17,9 +18,10 @@ const CustomNavbar = () => {
     document.body.style.overflow = "hidden";
     const navigate = useNavigate(); // Add useNavigate hook to access the navigation function
 
-
+    const {logout} = UserAuth(); // Add logout function from the AuthContext
 
     const handleLogout = () => {
+        logout();
         signOut(auth)
             .then(() => {
                 // Redirect to login page on successful logout
