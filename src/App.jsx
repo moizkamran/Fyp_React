@@ -1,9 +1,11 @@
-import AdminDashboard from "./Components/Admin/AdminDashboard";
 import AdminPerformance from "./Components/Admin/AdminPerformance";
+import AdminPerformance1 from "./Components/Admin/AdminPerformance";
+import AdminUser from "./Components/Admin/AdminUser";
 import Charts from "./Components/Admin/Charts";
 import Employee from "./Components/Employee/Employee";
 import EmployeeProfileSetting from "./Components/Employee/EmployeeProfileSetting";
 import Login from "./Auth/Login";
+import MainPage from "./Components/Dashboard/MainPage";
 import ProtectedRoute from "./Auth/ProtectedRoute";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
@@ -13,12 +15,21 @@ function App() {
   return (
     <AuthContextProvider>
       <Routes>
-        <Route path="/" element={<Login />} />
         <Route
-          path="/dashboard"
+          path="/"
+          element={
+
+            <MainPage />
+
+          }
+        />
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/AdminUser"
           element={
             <ProtectedRoute roles={["admin"]}>
-              <AdminDashboard />
+              <AdminUser />
             </ProtectedRoute>
           }
         />
@@ -31,13 +42,14 @@ function App() {
           }
         />
         <Route
-          path="/adminperformance"
+          path="/AdminPerformance"
           element={
             <ProtectedRoute roles={["admin"]}>
-              <AdminPerformance />
+              <AdminPerformance1 />
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/employee"
           element={

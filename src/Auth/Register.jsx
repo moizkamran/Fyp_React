@@ -8,40 +8,39 @@ const Register = () => {
 
     const handleEmailChange = (event) => {
         setEmail(event.target.value);
+
+        const handlePasswordChange = (event) => {
+            setPassword(event.target.value);
+        };
+
+
+        const Register = (e) => {
+            e.preventDefault();
+            createUserWithEmailAndPassword(auth, email, password).then((userCredenial) => {
+                console.log(userCredenial)
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
+
+        return (
+            <div>
+                <form onSubmit={Register}>
+                    <h1>Create Account</h1>
+                    <label>
+                        Email:
+                        <input type="email" value={email} onChange={handleEmailChange} />
+                    </label>
+                    <br />
+                    <label>
+                        Password:
+                        <input type="password" value={password} onChange={handlePasswordChange} />
+                    </label>
+                    <br />
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        );
     };
 
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value);
-    };
-
-
-    const Register = (e) => {
-        e.preventDefault();
-        createUserWithEmailAndPassword(auth, email, password).then((userCredenial) => {
-            console.log(userCredenial)
-        }).catch((error) => {
-            console.log(error)
-        })
-    }
-
-    return (
-        <div>
-            <form onSubmit={Register}>
-                <h1>Create Account</h1>
-                <label>
-                    Email:
-                    <input type="email" value={email} onChange={handleEmailChange} />
-                </label>
-                <br />
-                <label>
-                    Password:
-                    <input type="password" value={password} onChange={handlePasswordChange} />
-                </label>
-                <br />
-                <button type="submit">Login</button>
-            </form>
-        </div>
-    );
-};
-
-export default Register;
+    export default Register;

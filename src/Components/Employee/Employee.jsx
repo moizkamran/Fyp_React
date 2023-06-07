@@ -1,4 +1,3 @@
-import AdminDashboardContent from "../Admin/AdminDashboardCotent";
 import EmployeeInfo from "./EmployeeProfileSetting";
 import EmployeeProfile from "./EmployeeProfile";
 import { AppShell, Header, Navbar } from "@mantine/core";
