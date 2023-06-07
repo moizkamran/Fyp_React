@@ -28,13 +28,13 @@ const AdminPerformance1 = () => {
         }));
     };
 
-
-
     useEffect(() => {
         const goalsRef = ref(database, "Admin/goals");
         const unsubscribe = onValue(goalsRef, (snapshot) => {
             const goalsData = snapshot.val();
-            const goalsList = goalsData ? Object.entries(goalsData).map(([id, goal]) => ({ id, ...goal })) : [];
+            const goalsList = goalsData
+                ? Object.entries(goalsData).map(([id, goal]) => ({ id, ...goal }))
+                : [];
             setGoals(goalsList);
         });
 
@@ -43,7 +43,6 @@ const AdminPerformance1 = () => {
             unsubscribe();
         };
     }, []);
-
 
     const handleSaveUser = () => {
         const goalsRef = ref(database, "Admin/goals");
@@ -89,7 +88,6 @@ const AdminPerformance1 = () => {
                 console.error("Error deleting goal:", error);
             });
     };
-
 
     return (
         <div>
@@ -183,19 +181,17 @@ const AdminPerformance1 = () => {
                                 <tr key={index}>
                                     <td>{goal.Goal}</td>
                                     <td>{goal.Owner}</td>
-                                    <td colSpan="2">{goal.StartDate}</td>
-                                    <td colSpan="2">{goal.EndDate}</td>
-                                    <td colSpan="2">{goal.Progress}</td>
-                                    <td colSpan="2">
+                                    <td>{goal.StartDate}</td>
+                                    <td>{goal.EndDate}</td>
+                                    <td>{goal.Progress}</td>
+                                    <td>
                                         <Button
                                             size="sm"
                                             className="btn btn-primary"
-
                                             onClick={() => handleDeleteGoal(goal.id)}
                                         >
                                             Delete
                                         </Button>
-
                                     </td>
                                 </tr>
                             ))}
@@ -203,8 +199,6 @@ const AdminPerformance1 = () => {
                     </table>
 
                     <hr />
-
-
                 </div>
             </main>
 
@@ -216,7 +210,6 @@ const AdminPerformance1 = () => {
 };
 
 export default AdminPerformance1;
-
 
 export const AdminMenuPerformance = ({
     isMenuOpen,
@@ -237,8 +230,10 @@ export const AdminMenuPerformance = ({
             <Menu.Target>
                 <Button
                     className="btn btn-primary"
-
-                    ml={30} size="sm" onClick={handleMenuToggle}>
+                    ml={30}
+                    size="sm"
+                    onClick={handleMenuToggle}
+                >
                     Add Goal
                 </Button>
             </Menu.Target>
@@ -262,20 +257,22 @@ export const AdminMenuPerformance = ({
                     onChange={handleInputChange}
                 />
                 <TextInput
-                    label="StartDate"
+                    label="Start Date"
                     size="lg"
                     style={{ marginBottom: "0.5rem" }}
                     value={newUserData.StartDate}
                     name="StartDate"
                     onChange={handleInputChange}
+                    type="date" // Set input type to "date"
                 />
                 <TextInput
-                    label="EndDate"
+                    label="End Date"
                     size="lg"
                     style={{ marginBottom: "0.5rem" }}
                     value={newUserData.EndDate}
                     name="EndDate"
                     onChange={handleInputChange}
+                    type="date" // Set input type to "date"
                 />
                 <TextInput
                     label="Progress"
@@ -292,16 +289,15 @@ export const AdminMenuPerformance = ({
                         marginTop: "1rem",
                     }}
                 >
-                    <Button className="btn btn-primary"
-
+                    <Button
+                        className="btn btn-primary"
                         size="sm"
                         style={{ marginRight: "0.5rem" }}
                         onClick={() => setIsMenuOpen(false)}
                     >
                         Cancel
                     </Button>
-                    <Button className="btn btn-primary"
-                        size="sm" onClick={handleSaveUser}>
+                    <Button className="btn btn-primary" size="sm" onClick={handleSaveUser}>
                         Save
                     </Button>
                 </div>
