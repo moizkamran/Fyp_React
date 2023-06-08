@@ -11,6 +11,7 @@ import ProtectedRoute from "./Auth/ProtectedRoute";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { AuthContextProvider } from "./Context/AuthContext";
+import CustomNavbar from "./Components/Navbar/CustomNavbar";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         />
         <Route path="/login" element={<Login />} />
 
+        <Route element={<ProtectedRoute roles={["admin", "employee"]}><CustomNavbar/></ProtectedRoute>}>
         <Route
           path="/AdminUser"
           element={
@@ -84,6 +86,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        </Route>
       </Routes>
     </AuthContextProvider>
   );

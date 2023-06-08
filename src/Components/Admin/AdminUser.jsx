@@ -162,62 +162,6 @@ const AdminUser = () => {
     };
     return (
         <div>
-            <header>
-                <nav className="navbar navbar-expand-lg px-5">
-                    <div className="container-fluid d-flex justify-content-center">
-                        <a className="navbar-brand text-white" href="#">User</a>
-                        <button
-                            className="navbar-toggler"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbarNav"
-                            aria-controls="navbarNav"
-                            aria-expanded="false"
-                            aria-label="Toggle navigation"
-                        >
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
-                        <div
-                            className="collapse navbar-collapse justify-content-center"
-                            id="navbarNav"
-                        >
-                            <ul className="navbar-nav">
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="/AdminUser">
-                                        User Management
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="/AdminPerformance">
-                                        Performance Management
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="admin_careerpath.html">
-                                        Career Pathing
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="admin_report.html">
-                                        Reports
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="General/main.html">
-                                        Logout
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div className="user ms-auto">
-                            <p>
-                                Welcome, <span className="username">Admin</span>
-                            </p>
-                        </div>
-                    </div>
-                </nav>
-            </header>
-
             <main>
                 <div className="container">
                     <h2>Users</h2>

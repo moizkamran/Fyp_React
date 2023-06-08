@@ -9,20 +9,23 @@ const AdminCareerPath = () => {
   const [editingCareerPath, setEditingCareerPath] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     const careerPathRef = ref(database, "Admin/careerpath");
     onValue(careerPathRef, (snapshot) => {
       const paths = snapshot.val();
       if (paths) {
-        const careerPathsList = Object.keys(paths).map((key) => ({
-          id: key,
-          ...paths[key],
-        }));
+        const careerPathsList = Object.keys(paths)
+          .map((key) => ({
+            id: key,
+            ...paths[key],
+          }))
+          .filter((careerPath) => careerPath.AddedByUID === user.uid); // Only show career paths added by the current user
         setCareerPaths(careerPathsList);
       }
     });
-  }, []);
+  }, [user.uid]);
 
   const addCareerPath = () => {
     if (name && description) {
@@ -30,6 +33,7 @@ const AdminCareerPath = () => {
       const newCareerPath = {
         name: name,
         description: description,
+        AddedByUID: user.uid,
       };
       if (editingCareerPath) {
         // If editingCareerPath exists, update the career path
@@ -69,50 +73,7 @@ const AdminCareerPath = () => {
 
   return (
     <div>
-      <header>
-        {/* Navbar */}
-        <nav className="navbar navbar-expand-lg px-5">
-          <div className="container-fluid d-flex justify-content-center">
-            <a className="navbar-brand text-white" href="#">Career Pathing</a>
-            <button
-              className="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarNav"
-              aria-controls="navbarNav"
-              aria-expanded="false"
-              aria-label="Toggle navigation"
-            >
-              <span className="navbar-toggler-icon"></span>
-            </button>
-            <div
-              className="collapse navbar-collapse justify-content-center"
-              id="navbarNav"
-            >
-              <ul className="navbar-nav">
-                <li className="nav-item">
-                  <a className="nav-link text-white" href="admin_user.html">User Management</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link text-white" href="admin.performance.html">Performance Management</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link text-white" href="admin_careerpath.html">Career Pathing</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link text-white" href="admin_report.html">Reports</a>
-                </li>
-                <li className="nav-item">
-                  <a className="nav-link text-white" href="General/main.html">Logout</a>
-                </li>
-              </ul>
-            </div>
-            <div className="user ms-auto">
-              <p>Welcome, <span className="username">Admin</span></p>
-            </div>
-          </div>
-        </nav>
-      </header>
+      
       <main>
         <div className="container">
           <h2>Career Paths</h2>

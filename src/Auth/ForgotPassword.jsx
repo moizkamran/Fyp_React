@@ -1,11 +1,10 @@
 import "./Login.css";
 import React, { useState } from "react";
-import { Button, Center, Flex, Text, TextInput } from "@mantine/core";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Button, Center, TextInput } from "@mantine/core";
+import { Link, useNavigate } from "react-router-dom";
 import { UserAuth } from "../Context/AuthContext";
-import { Icon2fa, IconKey } from "@tabler/icons-react";
 
-const Login = () => {
+const ForgotPassword = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("");
@@ -64,7 +63,9 @@ const Login = () => {
                             required
                             placeholder="Enter password"
                         />
-                        <Flex><IconKey/><Text c="blue" component={NavLink} to="/ForgotPassword">Forgot Password</Text></Flex>
+                        <a href="fpass.html" className="form-text float-end">
+                            Forgot Password?
+                        </a>
                     </div>
                     <div className="mb-3">
                         <label htmlFor="role">Role:</label>
@@ -95,4 +96,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default ForgotPassword;

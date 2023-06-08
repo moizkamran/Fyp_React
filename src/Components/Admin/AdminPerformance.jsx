@@ -6,6 +6,7 @@ import { database } from "../../Firebase/Firebase";
 
 const AdminPerformance1 = () => {
     const [showAddGoal, setShowAddGoal] = useState(false);
+    const user = JSON.parse(localStorage.getItem('user'));
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [newUserData, setNewUserData] = useState({
         Goal: "",
@@ -34,6 +35,7 @@ const AdminPerformance1 = () => {
             const goalsData = snapshot.val();
             const goalsList = goalsData
                 ? Object.entries(goalsData).map(([id, goal]) => ({ id, ...goal }))
+                    .filter((goal) => goal.AddedByUID === user.uid) // Filter goals by user ID
                 : [];
             setGoals(goalsList);
         });
@@ -42,7 +44,7 @@ const AdminPerformance1 = () => {
             // Unsubscribe from the database reference when component unmounts
             unsubscribe();
         };
-    }, []);
+    }, [user.uid]); // Add user.uid as a dependency to the useEffect hook
 
     const handleSaveUser = () => {
         const goalsRef = ref(database, "Admin/goals");
@@ -53,6 +55,7 @@ const AdminPerformance1 = () => {
             StartDate: newUserData.StartDate,
             EndDate: newUserData.EndDate,
             Progress: newUserData.Progress,
+            AddedByUID: user.uid,
         };
 
         const goalRef = push(goalsRef); // Generate a unique ID for the new goal
@@ -60,7 +63,6 @@ const AdminPerformance1 = () => {
         set(goalRef, newGoal)
             .then(() => {
                 const goalId = goalRef.key; // Retrieve the goal ID
-                console.log("Goal saved:", goalId);
                 setNewUserData({
                     Goal: "",
                     Owner: "",
@@ -91,69 +93,7 @@ const AdminPerformance1 = () => {
 
     return (
         <div>
-            <header>
-                <nav className="navbar navbar-expand-lg px-5">
-                    <div className="container-fluid d-flex justify-content-center">
-                        <a className="navbar-brand text-white" href="#">
-                            Performance
-                        </a>
-                        <button
-                            className="navbar-toggler"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbarNav"
-                            aria-controls="navbarNav"
-                            aria-expanded="false"
-                            aria-label="Toggle navigation"
-                        >
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
-                        <div
-                            className="collapse navbar-collapse justify-content-center"
-                            id="navbarNav"
-                        >
-                            <ul className="navbar-nav">
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="admin_user.html">
-                                        User Management
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a
-                                        className="nav-link text-white"
-                                        href="admin.performance.html"
-                                    >
-                                        Performance Management
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a
-                                        className="nav-link text-white"
-                                        href="admin_careerpath.html"
-                                    >
-                                        Career Pathing
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="admin_report.html">
-                                        Reports
-                                    </a>
-                                </li>
-                                <li className="nav-item">
-                                    <a className="nav-link text-white" href="General/main.html">
-                                        Logout
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div className="user ms-auto">
-                            <p>
-                                Welcome, <span className="username">Admin</span>
-                            </p>
-                        </div>
-                    </div>
-                </nav>
-            </header>
+            
             <main>
                 <div className="container">
                     <h2>Performance Goals</h2>
