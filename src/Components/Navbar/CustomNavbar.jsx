@@ -1,10 +1,10 @@
-import AdminDashboardContent from "../Admin/AdminDashboardCotent";
-import { AppShell, Header, Navbar } from "@mantine/core";
+
+import { AppShell, Button, Header, Navbar, ScrollArea, Text } from "@mantine/core";
 import { signOut } from "firebase/auth";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../../Firebase/Firebase";
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { UserAuth } from "../../Context/AuthContext";
+import { auth } from "../../Firebase/Firebase";
 
 import {
     IconHome2,
@@ -15,10 +15,9 @@ import {
     IconLogout,
 } from '@tabler/icons-react';
 const CustomNavbar = () => {
-    document.body.style.overflow = "hidden";
     const navigate = useNavigate(); // Add useNavigate hook to access the navigation function
 
-    const {logout} = UserAuth(); // Add logout function from the AuthContext
+    const { logout } = UserAuth(); // Add logout function from the AuthContext
 
     const handleLogout = () => {
         logout();
@@ -32,94 +31,79 @@ const CustomNavbar = () => {
             });
     };
 
+    // get user form localstoage
+    const user = JSON.parse(localStorage.getItem('user'));
+
+
+    const location = useLocation();
+
+    // remove the / from the pathname
+    const path = location.pathname.slice(1);
+    // space words
+    const pathName = path.replace(/([A-Z])/g, " $1").trim();
+    //remove the word admin
+    const pathName2 = pathName.replace("Admin", "");
+
+
+
 
     return (
-        <AppShell
-            navbar={
-                <Navbar
-                    width={{ base: 100 }} // Adjust the base width as per your requirements
-                    position="fixed"
-                    left={0}
-                    top={0}
-                    style={{
-                        height: "100vh",
-                        overflowY: "auto",
-                        backgroundColor: "rgb(34, 139, 230)",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                    }}
-                >
-                    <div
-                        style={{
-                            color: "white",
-                            fontSize: 24,
-                            fontWeight: "bold",
-                            marginTop: 20,
-                            textAlign: "center",
-                        }}
-                    >
-                        FYP
-                    </div>
-                    <div
-                        style={{
-                            flexGrow: 1,
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <ul
-                            style={{
-                                listStyle: "none",
-                                padding: 0,
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                            }}
+        <>
+        <header>
+                <nav className="navbar navbar-expand-lg px-5">
+                    <div className="container-fluid d-flex justify-content-center">
+                        <a className="navbar-brand text-white" href="#">
+                            {pathName2}
+                        </a>
+                        <button
+                            className="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarNav"
+                            aria-controls="navbarNav"
+                            aria-expanded="false"
+                            aria-label="Toggle navigation"
                         >
-                            <li style={{ marginBottom: 16 }}>
-                                <IconHome2 size={24} color="white" />
-                            </li>
-                            <li style={{ marginBottom: 16 }}>
-                                <Link to="/charts">
-                                    <IconGauge size={24} color="white" />
-                                </Link>                            </li>
-                            <li style={{ marginBottom: 16 }}>
-                                <IconDeviceDesktopAnalytics size={24} color="white" />
-                            </li>
-                            <li style={{ marginBottom: 16 }}>
-                                <IconFingerprint size={24} color="white" />
-                            </li>
-                            <li style={{ marginBottom: 16 }}>
-                                <IconUser size={24} color="white" />
-                            </li>
-                            <li
-
-                                style={{ marginBottom: 16 }}>
-                                <IconLogout
-                                    onClick={handleLogout}
-                                    size={24} color="white" />
-                            </li>
-                        </ul>
+                            <span className="navbar-toggler-icon"></span>
+                        </button>
+                        <div
+                            className="collapse navbar-collapse justify-content-center"
+                            id="navbarNav"
+                        >
+                            <ul className="navbar-nav">
+                                <li className="nav-item">
+                                    <Text component={NavLink} to="/AdminUser"
+                                    className="nav-link text-white">User Management</Text>
+                                </li>
+                                <li className="nav-item">
+                                <Text component={NavLink} to="/AdminPerformance"
+                                    className="nav-link text-white">Performance Management</Text>
+                                </li>
+                                <li className="nav-item">
+                                <Text component={NavLink} to="/AdminCareerPath"
+                                    className="nav-link text-white">Carrer Pathing</Text>
+                                </li>
+                                <li className="nav-item">
+                                <Text component={NavLink} to="/AdminReport"
+                                    className="nav-link text-white">Reporting</Text>
+                                </li>
+                                <li className="nav-item">
+                                    <Button rightIcon={<IconLogout/>} onClick={handleLogout} color="dark">
+                                        Logout
+                                    </Button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div className="user ms-auto">
+                            <p>
+                                Welcome, <span className="username">{user.email}</span>
+                            </p>
+                        </div>
                     </div>
-                </Navbar>
-            }
-
-            styles={(theme) => ({
-                main: {
-
-                    marginTop: "20px",
-                    paddingTop: theme.spacing.md,
-                    overflow: "auto",
-                    backgroundColor: "white",
-
-                },
-            })}
-        >
-            <AdminDashboardContent />
-
-        </AppShell>
+                </nav>
+            </header>
+                <Outlet />
+            </>
     );
 };
 
