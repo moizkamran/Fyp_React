@@ -1,9 +1,9 @@
 import "./Login.css";
 import React, { useState } from "react";
 import { Button, Center, Flex, Text, TextInput } from "@mantine/core";
+import { Icon2fa, IconKey } from "@tabler/icons-react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { UserAuth } from "../Context/AuthContext";
-import { Icon2fa, IconKey } from "@tabler/icons-react";
 
 const Login = () => {
     const [username, setUsername] = useState("");
@@ -64,7 +64,7 @@ const Login = () => {
                             required
                             placeholder="Enter password"
                         />
-                        <Flex><IconKey/><Text c="blue" component={NavLink} to="/ForgotPassword">Forgot Password</Text></Flex>
+                        <Flex mt={15}><IconKey /><Text c="blue" component={NavLink} to="/ForgotPassword">Forgot Password</Text></Flex>
                     </div>
                     <div className="mb-3">
                         <label htmlFor="role">Role:</label>
@@ -80,9 +80,11 @@ const Login = () => {
                             <option value="employee">Employee</option>
                         </select>
                     </div>
-                    <button type="submit" className="btn btn-primary">
+                    <Button
+                        size="md"
+                        type="submit" className="btn btn-primary">
                         Login
-                    </button>
+                    </Button>
                 </form>
                 <div className="features">
                     <p>

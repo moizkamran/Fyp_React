@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getDatabase, onValue, push, ref, remove, update } from "firebase/database";
-import { database } from "../../Firebase/Firebase";
+import { getDownloadURL, uploadBytes } from "@firebase/storage";
+import { getDatabase, onValue, push, ref, remove, set, update } from "firebase/database";
+import { database, storage } from "../../Firebase/Firebase";
 
 const AdminCareerPath = () => {
   const [careerPaths, setCareerPaths] = useState([]);
@@ -27,7 +28,7 @@ const AdminCareerPath = () => {
     });
   }, [user.uid]);
 
-  const addCareerPath = () => {
+  const addCareerPath = async () => {
     if (name && description) {
       const careerPathRef = ref(database, "Admin/careerpath");
       const newCareerPath = {
@@ -35,20 +36,36 @@ const AdminCareerPath = () => {
         description: description,
         AddedByUID: user.uid,
       };
+
       if (editingCareerPath) {
         // If editingCareerPath exists, update the career path
         const careerPathToUpdate = ref(database, `Admin/careerpath/${editingCareerPath}`);
         setEditingCareerPath(null);
-        update(careerPathToUpdate, newCareerPath);
+        await update(careerPathToUpdate, newCareerPath);
       } else {
         // If editingCareerPath doesn't exist, add a new career path
-        push(careerPathRef, newCareerPath);
+        const newCareerPathRef = push(careerPathRef);
+        const newCareerPathKey = newCareerPathRef.key;
+
+        // Upload the file to Firebase Storage
+        const fileInput = document.getElementById("file");
+        const file = fileInput.files[0];
+        const storageRef = ref(storage, `careerpath_files/${newCareerPathKey}/${file.name}`);
+        await uploadBytes(storageRef, file);
+
+        // Add the file URL to the career path data
+        const downloadURL = await getDownloadURL(storageRef);
+        newCareerPath.fileURL = downloadURL;
+
+        // Save the career path data to the database
+        await set(newCareerPathRef, newCareerPath);
       }
 
       setName("");
       setDescription("");
     }
   };
+
 
   const editCareerPath = (id) => {
     const careerPathToEdit = careerPaths.find((careerPath) => careerPath.id === id);
@@ -73,7 +90,7 @@ const AdminCareerPath = () => {
 
   return (
     <div>
-      
+
       <main>
         <div className="container">
           <h2>Career Paths</h2>

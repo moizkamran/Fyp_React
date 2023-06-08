@@ -1,18 +1,26 @@
 import "./AdminUser.css";
 import React, { useEffect, useState } from "react";
-import { Button, Center, Flex, Menu, Table, TextInput, Title } from "@mantine/core";
 import { off, onValue, push, ref } from "firebase/database";
 import { FaSearch } from "react-icons/fa";
 import { database } from "../../Firebase/Firebase";
 
-const AdminUser = () => {
+import {
+    Button,
+    Center,
+    Flex,
+    Menu,
+    Table,
+    TextInput,
+    Title,
+} from "@mantine/core";
 
+const AdminUser = () => {
     const [userData, setUserData] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState("");
     const [filteredUserData, setFilteredUserData] = useState([]);
 
     useEffect(() => {
-        const usersRef = ref(database, "Employees/Profile");
+        const usersRef = ref(database, "Employees/Data");
 
         const fetchData = () => {
             onValue(usersRef, (snapshot) => {
@@ -20,15 +28,14 @@ const AdminUser = () => {
                 if (data) {
                     const userList = Object.values(data);
                     setUserData(userList);
+                    setFilteredUserData(userList);
                 }
             });
         };
 
         fetchData();
 
-        // Clean up the listener when the component unmounts
         return () => {
-            // Detach the event listener
             off(usersRef);
         };
     }, []);
@@ -40,6 +47,7 @@ const AdminUser = () => {
         email: "",
         name: "",
         permission: "",
+        password: "",
     });
 
     const totalRows = filteredUserData.length;
@@ -75,6 +83,7 @@ const AdminUser = () => {
             email: newUserData.email,
             name: newUserData.name,
             permission: newUserData.permission,
+            password: newUserData.password,
         };
 
         push(usersRef, newUser)
@@ -85,6 +94,7 @@ const AdminUser = () => {
                     email: "",
                     name: "",
                     permission: "",
+                    password: "",
                 });
                 setIsMenuOpen(false);
             })
@@ -93,18 +103,19 @@ const AdminUser = () => {
             });
     };
 
+
     const handleSearchInputChange = (event) => {
         const { value } = event.target;
         setSearchQuery(value);
+        filterData();
     };
 
-    useEffect(() => {
+    const filterData = () => {
         const filteredData = userData.filter((user) =>
-            user && user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase())
+            user.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredUserData(filteredData);
-    }, [searchQuery, userData]);
-
+    };
 
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -118,14 +129,14 @@ const AdminUser = () => {
     const handleSaveButtonClick = (index) => {
         const updatedUser = { ...displayedRows[index] };
 
-        const userChangesRef = ref(database, 'Employees/ChangedData');
+        const userChangesRef = ref(database, "Employees/ChangedData");
 
         push(userChangesRef, updatedUser)
             .then((newUserRef) => {
                 const newUserId = newUserRef.key;
                 updatedUser.userId = newUserId;
 
-                console.log('User saved:', updatedUser);
+                console.log("User saved:", updatedUser);
 
                 const updatedUserData = [...userData];
                 updatedUserData.splice(startIndex + index + 1, 0, updatedUser);
@@ -133,10 +144,9 @@ const AdminUser = () => {
                 setEditRowIndex(-1);
             })
             .catch((error) => {
-                console.error('Error saving user:', error);
+                console.error("Error saving user:", error);
             });
     };
-
 
     const handleCancelEditButtonClick = () => {
         setEditRowIndex(-1);
@@ -151,7 +161,7 @@ const AdminUser = () => {
                     key={i}
                     onClick={() => handlePageChange(i)}
                     disabled={i === currentPage}
-                    style={{ margin: "0 0.25rem" }} // Add margin to create space between buttons
+                    style={{ margin: "0 0.25rem" }}
                 >
                     {i}
                 </Button>
@@ -160,6 +170,7 @@ const AdminUser = () => {
 
         return pageNumbers;
     };
+
     return (
         <div>
             <main>
@@ -187,6 +198,8 @@ const AdminUser = () => {
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Password</th>
+
                                 <th>Permissions</th>
                                 <th>Actions</th>
                             </tr>
@@ -195,6 +208,21 @@ const AdminUser = () => {
                             {displayedRows.map((row, index) => (
                                 <tr key={index}>
                                     <td>
+                                        {/* Render the name input field if in edit mode, otherwise display the name */}
+                                        {editRowIndex === index ? (
+                                            <input
+
+                                                type="text"
+                                                name="name"
+                                                value={row.name}
+                                                onChange={(event) => handleEditInputChange(event, index)}
+                                            />
+                                        ) : (
+                                            row.name
+                                        )}
+                                    </td>
+                                    <td>
+                                        {/* Render the email input field if in edit mode, otherwise display the email */}
                                         {editRowIndex === index ? (
                                             <input
                                                 type="text"
@@ -206,19 +234,22 @@ const AdminUser = () => {
                                             row.email
                                         )}
                                     </td>
+
                                     <td>
+                                        {/* Render the password input field if in edit mode, otherwise display the password */}
                                         {editRowIndex === index ? (
                                             <input
                                                 type="text"
-                                                name="name"
-                                                value={row.name}
+                                                name="password"
+                                                value={row.password}
                                                 onChange={(event) => handleEditInputChange(event, index)}
                                             />
                                         ) : (
-                                            row.name
+                                            row.password
                                         )}
                                     </td>
                                     <td>
+                                        {/* Render the permission input field if in edit mode, otherwise display the permission */}
                                         {editRowIndex === index ? (
                                             <input
                                                 type="text"
@@ -233,10 +264,10 @@ const AdminUser = () => {
                                     <td>
                                         {editRowIndex === index ? (
                                             <>
+                                                {/* Render the Save and Cancel buttons when in edit mode */}
                                                 <Button
                                                     size="sm"
                                                     className="btn btn-primary"
-
                                                     onClick={() => handleSaveButtonClick(index)}
                                                 >
                                                     Save
@@ -244,7 +275,6 @@ const AdminUser = () => {
                                                 <Button
                                                     size="sm"
                                                     className="btn btn-primary"
-
                                                     onClick={() => handleCancelEditButtonClick()}
                                                 >
                                                     Cancel
@@ -252,6 +282,7 @@ const AdminUser = () => {
                                             </>
                                         ) : (
                                             <>
+                                                {/* Render the Edit and Delete buttons when not in edit mode */}
                                                 <Button
                                                     size="sm"
                                                     className="btn btn-primary"
@@ -259,19 +290,13 @@ const AdminUser = () => {
                                                 >
                                                     Edit
                                                 </Button>
-                                                <Button
-                                                    ml={10}
-                                                    size="sm"
-                                                    className="btn btn-primary"
-                                                >
-                                                    Delete
-                                                </Button></>
 
-
+                                            </>
                                         )}
                                     </td>
                                 </tr>
                             ))}
+
                         </tbody>
 
                     </table>
@@ -346,6 +371,15 @@ export const AdminMenuComponent = ({
                     name="email"
                     onChange={handleInputChange}
                 />
+                <TextInput
+                    label="Password"
+                    size="lg"
+                    style={{ marginBottom: "0.5rem" }}
+                    value={newUserData.password}
+                    name="password"
+                    onChange={handleInputChange}
+                />
+
                 <TextInput
                     label="Permission"
                     size="lg"

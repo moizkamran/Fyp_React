@@ -2,6 +2,7 @@ import "./AdminPerformance.css";
 import React, { useEffect, useState } from "react";
 import { Button, Center, Input, Menu, Paper, Table, TextInput, Title } from "@mantine/core";
 import { onValue, push, ref, remove, set, update } from "firebase/database";
+import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { database } from "../../Firebase/Firebase";
 
 const AdminPerformance1 = () => {
@@ -15,6 +16,8 @@ const AdminPerformance1 = () => {
         EndDate: "",
         Progress: "",
     });
+    const [chartData, setChartData] = useState([]);
+
     const [goals, setGoals] = useState([]);
 
     const handleMenuToggle = () => {
@@ -90,10 +93,41 @@ const AdminPerformance1 = () => {
                 console.error("Error deleting goal:", error);
             });
     };
+    useEffect(() => {
+        fetchChartData(user.uid);
+    }, [user.uid]);
+    const fetchChartData = (userId) => {
+        const goalsRef = ref(database, "Admin/goals");
+        onValue(goalsRef, (snapshot) => {
+            const goalsData = snapshot.val();
+            const goalsList = goalsData
+                ? Object.entries(goalsData)
+                    .map(([id, goal]) => ({ id, ...goal }))
+                    .filter((goal) => goal.AddedByUID === userId)
+                : [];
+            const chartData = [];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const monthlyProgress = Array(12).fill(0);
+            goalsList.forEach((goal) => {
+                const progress = parseInt(goal.Progress);
+                const startDate = new Date(goal.StartDate);
+                const monthIndex = startDate.getMonth();
+                monthlyProgress[monthIndex] += progress;
+            });
+            monthlyProgress.forEach((progress, index) => {
+                const averageProgress = progress / goalsList.length;
+                chartData.push({ name: months[index], value: averageProgress });
+            });
+            setChartData(chartData);
+        });
+    };
+
+
+
 
     return (
         <div>
-            
+
             <main>
                 <div className="container">
                     <h2>Performance Goals</h2>
@@ -137,9 +171,26 @@ const AdminPerformance1 = () => {
                             ))}
                         </tbody>
                     </table>
+                    <h2 style={{ marginTop: "10px" }} >Line Chart</h2>
+                    <LineChart width={800} height={400} data={chartData}>
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
+                        <Tooltip />
+                        <Legend />
+                        <Line
+                            type="monotone"
+                            dataKey="value"
+                            stroke="#007bff"
+                            strokeWidth={3}
+                            dot={false} // Set dot prop to false
+                        />
+                    </LineChart>
 
                     <hr />
                 </div>
+
+
             </main>
 
             <footer>
