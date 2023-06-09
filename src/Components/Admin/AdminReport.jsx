@@ -86,7 +86,7 @@ const AdminReport = () => {
 
     return (
         <div>
-           
+
             <main>
                 <div className="container">
                     <h1>Report</h1>

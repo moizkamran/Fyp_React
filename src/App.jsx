@@ -7,6 +7,7 @@ import Employee from "./Components/Employee/Employee";
 import EmployeeHistory from "./Components/Employee/EmployeeHistory";
 import EmployeePerformance from "./Components/Employee/EmployeePerformance";
 import EmployeeReport from "./Components/Employee/EmployeeReport";
+import ForgotPassword from "./Auth/ForgotPassword";
 import Login from "./Auth/Login";
 import MainPage from "./Components/Dashboard/MainPage";
 import ProtectedRoute from "./Auth/ProtectedRoute";
@@ -26,6 +27,7 @@ function App() {
 
           }
         />
+        <Route path="/ForgotPassword" element={<ForgotPassword />} />
 
 
         <Route path="/login" element={<Login />} />

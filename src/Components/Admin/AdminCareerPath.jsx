@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getDownloadURL, uploadBytes } from "@firebase/storage";
-import { getDatabase, onValue, push, ref, remove, set, update } from "firebase/database";
+import { getDatabase, onValue, push, ref, remove, update } from "firebase/database";
 import { database, storage } from "../../Firebase/Firebase";
 
 const AdminCareerPath = () => {
@@ -28,7 +27,7 @@ const AdminCareerPath = () => {
     });
   }, [user.uid]);
 
-  const addCareerPath = async () => {
+  const addCareerPath = () => {
     if (name && description) {
       const careerPathRef = ref(database, "Admin/careerpath");
       const newCareerPath = {
@@ -36,36 +35,20 @@ const AdminCareerPath = () => {
         description: description,
         AddedByUID: user.uid,
       };
-
       if (editingCareerPath) {
         // If editingCareerPath exists, update the career path
         const careerPathToUpdate = ref(database, `Admin/careerpath/${editingCareerPath}`);
         setEditingCareerPath(null);
-        await update(careerPathToUpdate, newCareerPath);
+        update(careerPathToUpdate, newCareerPath);
       } else {
         // If editingCareerPath doesn't exist, add a new career path
-        const newCareerPathRef = push(careerPathRef);
-        const newCareerPathKey = newCareerPathRef.key;
-
-        // Upload the file to Firebase Storage
-        const fileInput = document.getElementById("file");
-        const file = fileInput.files[0];
-        const storageRef = ref(storage, `careerpath_files/${newCareerPathKey}/${file.name}`);
-        await uploadBytes(storageRef, file);
-
-        // Add the file URL to the career path data
-        const downloadURL = await getDownloadURL(storageRef);
-        newCareerPath.fileURL = downloadURL;
-
-        // Save the career path data to the database
-        await set(newCareerPathRef, newCareerPath);
+        push(careerPathRef, newCareerPath);
       }
 
       setName("");
       setDescription("");
     }
   };
-
 
   const editCareerPath = (id) => {
     const careerPathToEdit = careerPaths.find((careerPath) => careerPath.id === id);
@@ -87,6 +70,7 @@ const AdminCareerPath = () => {
   const currentItems = careerPaths.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 
   return (
     <div>
@@ -119,7 +103,7 @@ const AdminCareerPath = () => {
           <ul className="pagination">
             {Array.from({ length: Math.ceil(careerPaths.length / itemsPerPage) }, (_, i) => (
               <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                <button className="page-link" onClick={() => paginate(i + 1)}>{i + 1}</button>
+                <button className="btn btn-primary" onClick={() => paginate(i + 1)}>{i + 1}</button>
               </li>
             ))}
           </ul>

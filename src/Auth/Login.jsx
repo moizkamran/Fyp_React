@@ -20,7 +20,7 @@ const Login = () => {
             await signIn(username, password, role);
             navigate("/AdminUser");
         } catch (e) {
-            setError(e.message);
+            setError("Invalid email or password"); // Set the error message
             console.log(e.message);
         }
     };
@@ -34,6 +34,7 @@ const Login = () => {
                         Secure Employee Career Pathing System using AES
                     </h4>
                 </div>
+
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label htmlFor="username" className="form-label">
@@ -64,7 +65,13 @@ const Login = () => {
                             required
                             placeholder="Enter password"
                         />
-                        <Flex mt={15}><IconKey /><Text c="blue" component={NavLink} to="/ForgotPassword">Forgot Password</Text></Flex>
+                        {error && <Text color="red" className="error-message">{error}</Text>} {/* Display the error message */}
+                        <Flex mt={15}>
+                            <IconKey />
+                            <Text c="blue" component={NavLink} to="/ForgotPassword">
+                                Forgot Password
+                            </Text>
+                        </Flex>
                     </div>
                     <div className="mb-3">
                         <label htmlFor="role">Role:</label>
@@ -82,7 +89,9 @@ const Login = () => {
                     </div>
                     <Button
                         size="md"
-                        type="submit" className="btn btn-primary">
+                        type="submit"
+                        className="btn btn-primary"
+                    >
                         Login
                     </Button>
                 </form>

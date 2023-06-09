@@ -1,4 +1,3 @@
-
 import { AppShell, Button, Header, Navbar, ScrollArea, Text } from "@mantine/core";
 import { signOut } from "firebase/auth";
 import { useState } from "react";
@@ -49,7 +48,7 @@ const CustomNavbar = () => {
 
     return (
         <>
-        <header>
+            <header>
                 <nav className="navbar navbar-expand-lg px-5">
                     <div className="container-fluid d-flex justify-content-center">
                         <a className="navbar-brand text-white" href="#">
@@ -73,22 +72,25 @@ const CustomNavbar = () => {
                             <ul className="navbar-nav">
                                 <li className="nav-item">
                                     <Text component={NavLink} to="/AdminUser"
-                                    className="nav-link text-white">User Management</Text>
+                                        className="nav-link text-white">User Management</Text>
                                 </li>
                                 <li className="nav-item">
-                                <Text component={NavLink} to="/AdminPerformance"
-                                    className="nav-link text-white">Performance Management</Text>
+                                    <Text component={NavLink} to="/AdminPerformance"
+                                        className="nav-link text-white">Performance Management</Text>
                                 </li>
                                 <li className="nav-item">
-                                <Text component={NavLink} to="/AdminCareerPath"
-                                    className="nav-link text-white">Carrer Pathing</Text>
+                                    <Text component={NavLink} to="/AdminCareerPath"
+                                        className="nav-link text-white">Carrer Pathing</Text>
                                 </li>
                                 <li className="nav-item">
-                                <Text component={NavLink} to="/AdminReport"
-                                    className="nav-link text-white">Reporting</Text>
+                                    <Text component={NavLink} to="/AdminReport"
+                                        className="nav-link text-white">Reporting</Text>
                                 </li>
                                 <li className="nav-item">
-                                    <Button rightIcon={<IconLogout/>} onClick={handleLogout} color="dark">
+                                    <Button
+                                        mt={2}
+                                        rightIcon={<IconLogout />} onClick={handleLogout} className="btn btn-primary"
+                                    >
                                         Logout
                                     </Button>
                                 </li>
@@ -102,8 +104,8 @@ const CustomNavbar = () => {
                     </div>
                 </nav>
             </header>
-                <Outlet />
-            </>
+            <Outlet />
+        </>
     );
 };
 

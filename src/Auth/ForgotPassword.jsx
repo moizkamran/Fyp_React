@@ -1,98 +1,65 @@
-import "./Login.css";
 import React, { useState } from "react";
-import { Button, Center, TextInput } from "@mantine/core";
-import { Link, useNavigate } from "react-router-dom";
-import { UserAuth } from "../Context/AuthContext";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../Firebase/Firebase";
 
 const ForgotPassword = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [role, setRole] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
-    const { signIn } = UserAuth();
+    const [email, setEmail] = useState("");
+    const [resetSent, setResetSent] = useState(false);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        try {
-            await signIn(username, password, role);
-            navigate("/AdminUser");
-        } catch (e) {
-            setError(e.message);
-            console.log(e.message);
-        }
+    const handleEmailChange = (event) => {
+        setEmail(event.target.value);
+    };
+
+    const handleResetPassword = (event) => {
+        event.preventDefault();
+
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                setResetSent(true);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     };
 
     return (
-        <Center mt={100}>
-            <div className="login-card">
-                <div className="login-header">
-                    <h3 className="text-center">Logo</h3>
-                    <h4 className="p-3 text-center">
-                        Secure Employee Career Pathing System using AES
-                    </h4>
+        <div>
+            <section id="login">
+                <div className="login-card">
+                    <div className="login-header ">
+                        <h3 className="text-center">Logo</h3>
+                        <h4 className="p-3 text-center">Forgot Password</h4>
+                        {resetSent ? (
+                            <p className="text-center">Password reset email sent. Please check your inbox.</p>
+                        ) : (
+                            <p>Please enter your email to reset your password:</p>
+                        )}
+                    </div>
+                    <form onSubmit={handleResetPassword}>
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                className="form-control"
+                                id="email"
+                                name="email"
+                                required
+                                value={email}
+                                onChange={handleEmailChange}
+                                placeholder="Enter email"
+                            />
+                        </div>
+                        <div className="text-center mt-4">
+                            <button type="submit" className="btn btn-primary">
+                                Reset password
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-3">
-                        <label htmlFor="username" className="form-label">
-                            Username
-                        </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="username"
-                            name="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                            placeholder="John Doe"
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="password" className="form-label">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            className="form-control"
-                            id="password"
-                            name="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            placeholder="Enter password"
-                        />
-                        <a href="fpass.html" className="form-text float-end">
-                            Forgot Password?
-                        </a>
-                    </div>
-                    <div className="mb-3">
-                        <label htmlFor="role">Role:</label>
-                        <select
-                            id="role"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            required
-                            style={{ marginBottom: "20px", borderRadius: "8px" }}
-                        >
-                            <option value="">Select a role</option>
-                            <option value="admin">Admin</option>
-                            <option value="employee">Employee</option>
-                        </select>
-                    </div>
-                    <button type="submit" className="btn btn-primary">
-                        Login
-                    </button>
-                </form>
-                <div className="features">
-                    <p>
-                        Interested in Employee Career Pathing System using AES?{" "}
-                        <a href="#">Contact us</a> to know more!
-                    </p>
-                </div>
-            </div>
-        </Center>
+            </section>
+        </div>
     );
 };
 
