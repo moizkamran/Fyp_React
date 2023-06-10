@@ -13,6 +13,7 @@ import {
     TextInput,
     Title,
 } from "@mantine/core";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 
 const AdminUser = () => {
     const [userData, setUserData] = useState([]);
@@ -77,31 +78,47 @@ const AdminUser = () => {
     };
 
     const handleSaveUser = () => {
+        const auth = getAuth(); // Get the Firebase Auth instance
         const usersRef = ref(database, "Employees/Data");
-
         const newUser = {
-            email: newUserData.email,
-            name: newUserData.name,
-            permission: newUserData.permission,
-            password: newUserData.password,
-        };
-
-        push(usersRef, newUser)
-            .then(() => {
-                console.log("User saved:", newUser);
+            [newUserData.email]: {
+              name: newUserData.name,
+              permission: newUserData.permission,
+              password: newUserData.password,
+            }
+          };
+                 
+      
+        createUserWithEmailAndPassword(auth, newUserData.email, newUserData.password)
+          .then((userCredential) => {
+            // User creation successful
+            const user = userCredential.user;
+            console.log("User created:", user);
+      
+            // Save user data in the Realtime Database
+            push(usersRef, newUser)
+              .then(() => {
+                console.log(newUser);
                 setUserData((prevData) => [...prevData, newUser]);
                 setNewUserData({
-                    email: "",
-                    name: "",
-                    permission: "",
-                    password: "",
+                  email: "",
+                  name: "",
+                  permission: "",
+                  password: "",
                 });
                 setIsMenuOpen(false);
-            })
-            .catch((error) => {
-                console.error("Error saving user:", error);
-            });
-    };
+              })
+              .catch((error) => {
+                console.error("Error saving user data:", error);
+              });
+          })
+          .catch((error) => {
+            console.error("Error creating user:", error);
+          });
+      };
+
+      
+
 
 
     const handleSearchInputChange = (event) => {
