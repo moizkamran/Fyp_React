@@ -1,7 +1,7 @@
-import "./AdminPerformance.css";
 import React, { useEffect, useState } from "react";
 import { Button, Center, Input, Menu, Paper, Table, TextInput, Title } from "@mantine/core";
 import { onValue, push, ref, remove, set, update } from "firebase/database";
+import { ToastContainer, toast } from "react-toastify";
 import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { database } from "../../Firebase/Firebase";
 
@@ -19,6 +19,8 @@ const AdminPerformance1 = () => {
     const [chartData, setChartData] = useState([]);
 
     const [goals, setGoals] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const goalsPerPage = 3;
 
     const handleMenuToggle = () => {
         setIsMenuOpen(!isMenuOpen);
@@ -37,7 +39,8 @@ const AdminPerformance1 = () => {
         const unsubscribe = onValue(goalsRef, (snapshot) => {
             const goalsData = snapshot.val();
             const goalsList = goalsData
-                ? Object.entries(goalsData).map(([id, goal]) => ({ id, ...goal }))
+                ? Object.entries(goalsData)
+                    .map(([id, goal]) => ({ id, ...goal }))
                     .filter((goal) => goal.AddedByUID === user.uid) // Filter goals by user ID
                 : [];
             setGoals(goalsList);
@@ -74,13 +77,14 @@ const AdminPerformance1 = () => {
                     Progress: "",
                 });
                 setIsMenuOpen(false);
+                toast.success("Goal added"); // Show success toast notification
             })
             .catch((error) => {
                 console.error("Error saving goal:", error);
+                toast.error("Failed to add goal"); // Show error toast notification
             });
     };
 
-    // ...
     const handleDeleteGoal = (goalId) => {
         const goalRef = ref(database, `Admin/goals/${goalId}`);
         remove(goalRef)
@@ -93,9 +97,11 @@ const AdminPerformance1 = () => {
                 console.error("Error deleting goal:", error);
             });
     };
+
     useEffect(() => {
         fetchChartData(user.uid);
     }, [user.uid]);
+
     const fetchChartData = (userId) => {
         const goalsRef = ref(database, "Admin/goals");
         onValue(goalsRef, (snapshot) => {
@@ -122,12 +128,16 @@ const AdminPerformance1 = () => {
         });
     };
 
+    // Pagination
+    const handlePageChange = (selectedPage) => {
+        setCurrentPage(selectedPage);
+    };
 
-
+    const paginatedGoals = goals.slice(currentPage * goalsPerPage, (currentPage + 1) * goalsPerPage);
+    const pageCount = Math.ceil(goals.length / goalsPerPage);
 
     return (
         <div>
-
             <main>
                 <div className="container">
                     <h2>Performance Goals</h2>
@@ -151,7 +161,7 @@ const AdminPerformance1 = () => {
                             </tr>
                         </thead>
                         <tbody id="goalsTableBody">
-                            {goals.map((goal, index) => (
+                            {paginatedGoals.map((goal, index) => (
                                 <tr key={index}>
                                     <td>{goal.Goal}</td>
                                     <td>{goal.Owner}</td>
@@ -171,7 +181,21 @@ const AdminPerformance1 = () => {
                             ))}
                         </tbody>
                     </table>
-                    <h2 style={{ marginTop: "10px" }} >Line Chart</h2>
+
+                    {/* Custom Pagination */}
+                    <div className="pagination">
+                        {Array.from(Array(pageCount).keys()).map((page) => (
+                            <button
+                                key={page}
+                                className={`btn btn-primary ${currentPage === page ? 'active' : ''}`}
+                                onClick={() => handlePageChange(page)}
+                            >
+                                {page + 1}
+                            </button>
+                        ))}
+                    </div>
+
+                    <h2 style={{ marginTop: "10px" }}>Line Chart</h2>
                     <LineChart width={800} height={400} data={chartData}>
                         <XAxis dataKey="name" />
                         <YAxis />
@@ -190,7 +214,7 @@ const AdminPerformance1 = () => {
                     <hr />
                 </div>
 
-
+                <ToastContainer /> {/* Add ToastContainer component */}
             </main>
 
             <footer>
@@ -201,6 +225,7 @@ const AdminPerformance1 = () => {
 };
 
 export default AdminPerformance1;
+
 
 export const AdminMenuPerformance = ({
     isMenuOpen,

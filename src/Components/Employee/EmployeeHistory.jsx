@@ -1,10 +1,14 @@
+import "react-toastify/dist/ReactToastify.css";
 import "./EmployeeHistory.css";
 import React, { useEffect, useState } from "react";
 import { onValue, push, ref, remove, set } from "firebase/database";
+import { ToastContainer, toast } from "react-toastify";
 import { database } from "../../Firebase/Firebase";
 
 const EmployeeHistory = () => {
     const [performanceData, setPerformanceData] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(5);
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -30,11 +34,13 @@ const EmployeeHistory = () => {
         set(newEntryRef, entryData)
             .then(() => {
                 console.log("Entry added successfully");
+                toast.success("Performance added successfully"); // Display success toast
                 // Reset the form
                 document.getElementById("add-form").reset();
             })
             .catch((error) => {
                 console.error("Error adding entry: ", error);
+                toast.error("Failed to add goal"); // Display error toast
             });
     };
     const handleEdit = (entryId) => {
@@ -94,38 +100,16 @@ const EmployeeHistory = () => {
             }
         });
     }, []);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = performanceData.slice(indexOfFirstItem, indexOfLastItem);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div>
 
             <main>
-                <div className="container">
-                    <h1>Performance History</h1>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Year</th>
-                                <th>Quarter</th>
-                                <th>Score</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="performanceTableBody">
-                            {performanceData.map((entry) => (
-                                <tr key={entry.id}>
-                                    <td>{entry.year}</td>
-                                    <td>{entry.quarter}</td>
-                                    <td>{entry.score}</td>
-                                    <td>
-                                        <button onClick={() => handleEdit(entry.id)}>Edit</button>
-                                        <button onClick={() => handleDelete(entry.id)}>Delete</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
                 <div className="add-performance">
                     <h2>Add Performance</h2>
 
@@ -147,11 +131,55 @@ const EmployeeHistory = () => {
                         <button type="submit">Add</button>
                     </form>
                 </div>
+                <div className="container">
+                    <h1>Performance History</h1>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Quarter</th>
+                                <th>Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="performanceTableBody">
+                            {performanceData.map((entry) => (
+                                <tr key={entry.id}>
+                                    <td>{entry.year}</td>
+                                    <td>{entry.quarter}</td>
+                                    <td>{entry.score}</td>
+                                    <td>
+                                        <button className="btn btn-primary"
+                                            onClick={() => handleEdit(entry.id)}>Edit</button>
+                                        <button style={{ marginLeft: "10px" }} className="btn btn-primary"
+                                            onClick={() => handleDelete(entry.id)}>Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <div className="pagination">
+                        <ul>
+                            {Array.from({ length: Math.ceil(performanceData.length / itemsPerPage) }).map((_, index) => (
+                                <li key={index}>
+                                    <button
+                                        className={`btn ${currentPage === index + 1 ? "btn-primary" : "btn-secondary"}`}
+                                        onClick={() => paginate(index + 1)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+
+
             </main>
             <footer>
                 <p>&copy; All rights reserved.</p>
             </footer>
-
+            <ToastContainer /> {/* Toast container */}
 
         </div>
     );

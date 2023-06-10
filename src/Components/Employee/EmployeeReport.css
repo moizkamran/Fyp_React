@@ -22,7 +22,6 @@ body {
   background-color: #fff; /* Set background color */
   border-radius: 10px; /* Set border radius */
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3); /* Set box shadow */
-  padding: 50px; /* Add padding */
 }
 
 .details {
@@ -35,11 +34,6 @@ body {
 
 .resume {
   padding: 0 10rem;
-}
-
-main {
-  margin-top: 5rem;
-  padding: 2rem;
 }
 
 h1 {

@@ -1,4 +1,4 @@
-import EmployeeReport from "./EmployeeReport";
+import EmployeeReport from "./EmployeeProfileSetting";
 import { signOut } from "firebase/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -23,8 +23,9 @@ const Employee = () => {
 
 
     return (
-
-        <EmployeeReport />
+        <>
+            <EmployeeReport />
+        </>
 
 
     );

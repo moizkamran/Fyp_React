@@ -1,23 +1,25 @@
+import "react-toastify/dist/ReactToastify.css";
 import "./AdminUser.css";
 import React, { useEffect, useState } from "react";
-import { off, onValue, push, ref } from "firebase/database";
+import { Button, Center, Flex, Menu, TextInput } from "@mantine/core";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { off, onValue, push, ref, remove } from "firebase/database";
 import { FaSearch } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
 import { database } from "../../Firebase/Firebase";
-
-import {
-    Button,
-    Center,
-    Flex,
-    Menu,
-    Table,
-    TextInput,
-    Title,
-} from "@mantine/core";
 
 const AdminUser = () => {
     const [userData, setUserData] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredUserData, setFilteredUserData] = useState([]);
+    const [displayedRows, setDisplayedRows] = useState([]);
+    const [editRowIndex, setEditRowIndex] = useState(-1);
+    const [newUserData, setNewUserData] = useState({
+        email: "",
+        name: "",
+        permission: "",
+        password: "",
+    });
 
     useEffect(() => {
         const usersRef = ref(database, "Employees/Data");
@@ -28,27 +30,31 @@ const AdminUser = () => {
                 if (data) {
                     const userList = Object.values(data);
                     setUserData(userList);
-                    setFilteredUserData(userList);
+
+                    // Store the user data in localStorage
+                    localStorage.setItem("userData", JSON.stringify(userList));
                 }
             });
         };
 
-        fetchData();
+        // Check if there is user data in localStorage
+        const existingUserData = JSON.parse(localStorage.getItem("userData"));
+        if (existingUserData && existingUserData.length > 0) {
+            setUserData(existingUserData);
+        } else {
+            fetchData();
+        }
 
+        // Clean up the listener when the component unmounts
         return () => {
+            // Detach the event listener
             off(usersRef);
         };
     }, []);
 
-    const rowsPerPage = 10;
+    const rowsPerPage = 3;
     const [currentPage, setCurrentPage] = useState(1);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [newUserData, setNewUserData] = useState({
-        email: "",
-        name: "",
-        permission: "",
-        password: "",
-    });
 
     const totalRows = filteredUserData.length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
@@ -77,50 +83,67 @@ const AdminUser = () => {
     };
 
     const handleSaveUser = () => {
+        const auth = getAuth();
         const usersRef = ref(database, "Employees/Data");
 
-        const newUser = {
-            email: newUserData.email,
-            name: newUserData.name,
-            permission: newUserData.permission,
-            password: newUserData.password,
-        };
+        createUserWithEmailAndPassword(auth, newUserData.email, newUserData.password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log("User created:", user);
 
-        push(usersRef, newUser)
-            .then(() => {
-                console.log("User saved:", newUser);
-                setUserData((prevData) => [...prevData, newUser]);
-                setNewUserData({
-                    email: "",
-                    name: "",
-                    permission: "",
-                    password: "",
-                });
-                setIsMenuOpen(false);
+                push(usersRef)
+                    .then((newUserRef) => {
+                        const newUserId = newUserRef.key;
+                        const newUser = {
+                            [newUserId]: {
+                                name: newUserData.name,
+                                permission: newUserData.permission,
+                                password: newUserData.password,
+                            },
+                        };
+
+                        console.log("User saved:", newUser);
+
+                        setUserData((prevData) => [...prevData, newUser]);
+                        setNewUserData({
+                            email: "",
+                            name: "",
+                            permission: "",
+                            password: "",
+                        });
+                        setIsMenuOpen(false);
+                        toast.success("User added");
+                    })
+                    .catch((error) => {
+                        console.error("Error saving user data:", error);
+                    });
             })
             .catch((error) => {
-                console.error("Error saving user:", error);
+                console.error("Error creating user:", error);
             });
     };
-
 
     const handleSearchInputChange = (event) => {
         const { value } = event.target;
         setSearchQuery(value);
-        filterData();
     };
 
-    const filterData = () => {
-        const filteredData = userData.filter((user) =>
-            user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    useEffect(() => {
+        const filteredData = userData.filter(
+            (user) =>
+                user &&
+                user.name &&
+                user.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredUserData(filteredData);
-    };
+    }, [searchQuery, userData]);
 
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const displayedRows = filteredUserData.slice(startIndex, endIndex);
-    const [editRowIndex, setEditRowIndex] = useState(-1);
+    useEffect(() => {
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const slicedRows = filteredUserData.slice(startIndex, endIndex);
+        setDisplayedRows(slicedRows);
+    }, [currentPage, filteredUserData]);
 
     const handleEditButtonClick = (index) => {
         setEditRowIndex(index);
@@ -139,7 +162,11 @@ const AdminUser = () => {
                 console.log("User saved:", updatedUser);
 
                 const updatedUserData = [...userData];
-                updatedUserData.splice(startIndex + index + 1, 0, updatedUser);
+                updatedUserData.splice(
+                    (currentPage - 1) * rowsPerPage + index + 1,
+                    0,
+                    updatedUser
+                );
                 setUserData(updatedUserData);
                 setEditRowIndex(-1);
             })
@@ -152,6 +179,45 @@ const AdminUser = () => {
         setEditRowIndex(-1);
     };
 
+    const handleDeleteUser = (index) => {
+        const userToDelete = displayedRows[index]; // Get the user object from displayedRows
+        const userToDeleteId = userToDelete.userId; // Retrieve the user's ID
+
+        // Find the corresponding index of the user within the original userData array
+        const originalIndex = userData.findIndex((user) => user.userId === userToDeleteId);
+
+        // Remove the user from the frontend by updating the userData state
+        setUserData((prevData) => {
+            const updatedUserData = [...prevData];
+            updatedUserData.splice(originalIndex, 1);
+            return updatedUserData;
+        });
+
+        // Remove the user from the database
+        const userRef = ref(database, `Employees/Data/${userToDeleteId}`);
+        remove(userRef)
+            .then(() => {
+                console.log("User deleted successfully from the database");
+
+                // Remove the user from localStorage
+                let existingUserData = JSON.parse(localStorage.getItem("userData"));
+                if (!existingUserData) {
+                    existingUserData = [];
+                }
+                const updatedUserData = existingUserData.filter(
+                    (user) => user.userId !== userToDeleteId
+                );
+                localStorage.setItem("userData", JSON.stringify(updatedUserData));
+            })
+            .catch((error) => {
+                console.error("Error deleting user from the database:", error);
+            });
+
+        // Show a success message to the user
+        toast.success("User deleted successfully");
+    };
+
+
     const renderPageNumbers = () => {
         const pageNumbers = [];
 
@@ -161,7 +227,7 @@ const AdminUser = () => {
                     key={i}
                     onClick={() => handlePageChange(i)}
                     disabled={i === currentPage}
-                    style={{ margin: "0 0.25rem" }}
+                    style={{ margin: "0 0.25rem" }} // Add margin to create space between buttons
                 >
                     {i}
                 </Button>
@@ -171,8 +237,11 @@ const AdminUser = () => {
         return pageNumbers;
     };
 
+
+
     return (
         <div>
+
             <main>
                 <div className="container">
                     <h2>Users</h2>
@@ -189,8 +258,8 @@ const AdminUser = () => {
                             isMenuOpen={isMenuOpen}
                             handleMenuToggle={handleMenuToggle}
                             handleInputChange={handleMenuInputChange}
-                            handleSaveUser={handleSaveUser}
-                            newUserData={newUserData}
+                            handleSaveUser={handleSaveUser} setIsMenuOpen={setIsMenuOpen} // Pass the setIsMenuOpen function as a prop
+                            newUserData={newUserData} toast={toast} // Pass the toast function as a prop
                         />
                     </Flex>                   <table id="userTable">
 
@@ -290,7 +359,13 @@ const AdminUser = () => {
                                                 >
                                                     Edit
                                                 </Button>
-
+                                                <Button
+                                                    size="sm"
+                                                    className="btn btn-primary"
+                                                    onClick={() => handleDeleteUser(index)}
+                                                >
+                                                    Delete
+                                                </Button>
                                             </>
                                         )}
                                     </td>
@@ -298,12 +373,11 @@ const AdminUser = () => {
                             ))}
 
                         </tbody>
-
                     </table>
                     <Center mt={5}>
                         {/* Pagination buttons */}
                         {Array.from({ length: totalPages }, (_, index) => (
-                            <Button
+                            <Button ml={5}
                                 className="btn btn-primary"
 
                                 key={index}
@@ -314,14 +388,12 @@ const AdminUser = () => {
                             </Button>
                         ))}
                     </Center>
-
                     <hr />
 
 
                 </div>
             </main>
-
-            <footer>
+            <ToastContainer /> {/* Add the ToastContainer component */}            <footer>
                 <p>All rights reserved.</p>
             </footer>
         </div>
@@ -334,7 +406,7 @@ export const AdminMenuComponent = ({
     handleMenuToggle,
     handleInputChange,
     handleSaveUser,
-    newUserData,
+    newUserData, toast, setIsMenuOpen
 }) => {
     return (
         <Menu
@@ -370,8 +442,7 @@ export const AdminMenuComponent = ({
                     value={newUserData.email}
                     name="email"
                     onChange={handleInputChange}
-                />
-                <TextInput
+                />  <TextInput
                     label="Password"
                     size="lg"
                     style={{ marginBottom: "0.5rem" }}
@@ -379,7 +450,6 @@ export const AdminMenuComponent = ({
                     name="password"
                     onChange={handleInputChange}
                 />
-
                 <TextInput
                     label="Permission"
                     size="lg"
@@ -399,15 +469,21 @@ export const AdminMenuComponent = ({
                         className="btn btn-primary"
                         size="sm"
                         style={{ marginRight: "0.5rem" }}
-                        onClick={() => setIsMenuOpen(false)}
+                        onClick={() => setIsMenuOpen(false)} // Close the menu
                     >
                         Cancel
                     </Button>
                     <Button
                         className="btn btn-primary"
-                        size="sm" onClick={handleSaveUser}>
+                        size="sm"
+                        onClick={() => {
+                            setIsMenuOpen(false); // Close the menu
+                            handleSaveUser();
+                        }}
+                    >
                         Save
                     </Button>
+
                 </div>
             </Menu.Dropdown>
         </Menu>

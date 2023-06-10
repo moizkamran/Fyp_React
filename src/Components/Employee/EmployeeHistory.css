@@ -69,8 +69,6 @@ body {
 }
 
 main {
-  margin-top: 5rem;
-  padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,9 +102,7 @@ tr:hover {
 }
 
 .add-performance {
-  margin-top: 50px;
   background-color: #fff;
-  padding: 2rem;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;

@@ -1,12 +1,15 @@
 import AdminCareerPath from "./Components/Admin/AdminCareerPath";
+import AdminLogin from "./Auth/AdminLogin";
 import AdminPerformance from "./Components/Admin/AdminPerformance";
 import AdminReport from "./Components/Admin/AdminReport";
 import AdminUser from "./Components/Admin/AdminUser";
 import CustomNavbar from "./Components/Navbar/CustomNavbar";
+import EmpNavbar from "./Components/Navbar/EmpNavbar";
 import Employee from "./Components/Employee/Employee";
 import EmployeeHistory from "./Components/Employee/EmployeeHistory";
 import EmployeePerformance from "./Components/Employee/EmployeePerformance";
-import EmployeeReport from "./Components/Employee/EmployeeReport";
+import EmployeeProfile from "./Components/Employee/EmployeeProfile.";
+import EmployeeProfileSetting from "./Components/Employee/EmployeeProfileSetting";
 import ForgotPassword from "./Auth/ForgotPassword";
 import Login from "./Auth/Login";
 import MainPage from "./Components/Dashboard/MainPage";
@@ -28,11 +31,13 @@ function App() {
           }
         />
         <Route path="/ForgotPassword" element={<ForgotPassword />} />
+        <Route path="/EmployeeProfile" element={<EmployeeProfile />} />
 
 
         <Route path="/login" element={<Login />} />
+        <Route path="/Admin_Login" element={<AdminLogin />} />
 
-        <Route element={<ProtectedRoute roles={["admin", "employee"]}><CustomNavbar /></ProtectedRoute>}>
+        <Route element={<ProtectedRoute roles={["admin",]}><CustomNavbar /></ProtectedRoute>}>
           <Route
             path="/AdminUser"
             element={
@@ -67,6 +72,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+        </Route>
+
+        <Route element={<ProtectedRoute roles={["employee",]}><EmpNavbar /></ProtectedRoute>}>
+          <Route
+            path="/EmployeeProfile"
+            element={
+              <ProtectedRoute roles={["employee"]}>
+                <EmployeeProfile />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/employee"
@@ -77,10 +93,10 @@ function App() {
             }
           />
           <Route
-            path="/EmployeeReport"
+            path="/EmployeeProfileSetting"
             element={
               <ProtectedRoute roles={["employee"]}>
-                <EmployeeReport />
+                <EmployeeProfileSetting />
               </ProtectedRoute>
             }
           />
@@ -100,7 +116,9 @@ function App() {
               </ProtectedRoute>
             }
           />
+
         </Route>
+
       </Routes>
     </AuthContextProvider>
   );

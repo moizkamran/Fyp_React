@@ -110,46 +110,9 @@ const EmployeePerformance = () => {
             <main>
                 <div className="container">
                     <h1 className="text-center">Performance Goals</h1>
-                    <section id="currentGoals">
-                        <h2>Current Goals</h2>
-                        <table id="goalsTable">
-                            <thead>
-                                <tr>
-                                    <th>Goal</th>
-                                    <th>Target</th>
-                                    <th>Deadline</th>
-                                    <th>Progress</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {goals.map((goal, index) => (
-                                    <tr key={index}>
-                                        <td>{goal.goal}</td>
-                                        <td>{goal.target}</td>
-                                        <td>{goal.deadline}</td>
-                                        <td>{goal.progress}</td>
-                                        <td>
-                                            <button
-                                                className="btn btn-primary"
-                                                onClick={() => handleEditGoal(index)}
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                style={{ marginLeft: "10px" }}
-                                                className="btn btn-primary"
-                                                onClick={() => handleDeleteGoal(index)}
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </section>
-                    <section id="newGoal">
+                    <section
+
+                        id="newGoal">
                         <h2>Add New Goal</h2>
                         <form id="addForm" onSubmit={handleAddGoal}>
                             <label htmlFor="goal">Goal:</label>
@@ -188,12 +151,53 @@ const EmployeePerformance = () => {
                                 onChange={handleProgressInputChange}
                                 required
                             />
-                            <button type="submit">
+                            <button
+                                style={{ marginTop: 10, marginBottom: 10 }}
+                                type="submit">
                                 {editIndex !== -1 ? "Update" : "Add"}
                             </button>
                         </form>
-                        <h2 style={{ marginTop: "10px" }} >Line Chart</h2>
 
+                    </section>
+
+                    <section id="currentGoals">
+                        <h2>Current Goals</h2>
+                        <table id="goalsTable">
+                            <thead>
+                                <tr>
+                                    <th>Goal</th>
+                                    <th>Target</th>
+                                    <th>Deadline</th>
+                                    <th>Progress</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {goals.map((goal, index) => (
+                                    <tr key={index}>
+                                        <td>{goal.goal}</td>
+                                        <td>{goal.target}</td>
+                                        <td>{goal.deadline}</td>
+                                        <td>{goal.progress}</td>
+                                        <td>
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={() => handleEditGoal(index)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                style={{ marginLeft: "10px" }}
+                                                className="btn btn-primary"
+                                                onClick={() => handleDeleteGoal(index)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </section>
 
 

@@ -7,7 +7,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { UserAuth } from "../Context/AuthContext";
 
-const Login = () => {
+const AdminLogin = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState("");
@@ -93,7 +93,7 @@ const Login = () => {
                             style={{ marginBottom: "20px", borderRadius: "8px" }}
                         >
                             <option value="">Select a role</option>
-                            <option value="employee">Employee</option>
+                            <option value="admin">admin</option>
                         </select>
                     </div>
                     <Button size="md" type="submit" className="btn btn-primary">
@@ -112,4 +112,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default AdminLogin;

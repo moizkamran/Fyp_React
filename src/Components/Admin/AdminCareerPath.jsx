@@ -84,6 +84,7 @@ const AdminCareerPath = () => {
               <tr>
                 <th>Name</th>
                 <th>Description</th>
+
                 <th>Actions</th>
               </tr>
             </thead>
@@ -91,6 +92,7 @@ const AdminCareerPath = () => {
               {currentItems.map((careerPath) => (
                 <tr key={careerPath.id}>
                   <td>{careerPath.name}</td>
+
                   <td>{careerPath.description}</td>
                   <td>
                     <button className="btn btn-primary" onClick={() => editCareerPath(careerPath.id)}>Edit</button>

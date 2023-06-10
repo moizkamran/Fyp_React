@@ -1,5 +1,6 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { Paper } from "@mantine/core";
 import { onValue, push, ref, remove } from "firebase/database";
 import { useEffect, useState } from "react";
 import { database } from "../../Firebase/Firebase";
@@ -89,6 +90,27 @@ const AdminReport = () => {
 
             <main>
                 <div className="container">
+                    <h2>Custom Reports</h2>
+                    <form>
+                        <label htmlFor="report_type">Report Type:</label>
+                        <select id="report_type" name="report_type" required>
+                            <option value="performance">Performance Report</option>
+                            <option value="training">Training Report</option>
+                            <option value="attendance">Attendance Report</option>
+                        </select>
+                        <br />
+                        <label htmlFor="start_date">Start Date:</label>
+                        <input type="date" id="start_date" name="start_date" required />
+                        <br />
+                        <label htmlFor="end_date">End Date:</label>
+                        <input type="date" id="end_date" name="end_date" required />
+                        <br />
+                        <button
+                            style={{ marginTop: '10px', marginBottom: "10px" }}
+                            className="btn btn-primary" type="button" onClick={generateReport}>
+                            Generate Report
+                        </button>
+                    </form>
                     <h1>Report</h1>
                     <p>Here's the report for the month of March:</p>
                     <table>
@@ -139,51 +161,10 @@ const AdminReport = () => {
                         )}
                     </div>
 
-                    <h2>Custom Reports</h2>
-                    <form>
-                        <label htmlFor="report_type">Report Type:</label>
-                        <select id="report_type" name="report_type" required>
-                            <option value="performance">Performance Report</option>
-                            <option value="training">Training Report</option>
-                            <option value="attendance">Attendance Report</option>
-                        </select>
-                        <br />
-                        <label htmlFor="start_date">Start Date:</label>
-                        <input type="date" id="start_date" name="start_date" required />
-                        <br />
-                        <label htmlFor="end_date">End Date:</label>
-                        <input type="date" id="end_date" name="end_date" required />
-                        <br />
-                        <button className="btn btn-primary" type="button" onClick={generateReport}>
-                            Generate Report
-                        </button>
-                    </form>
+
 
                     <hr />
-                    <h2>Reports History</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Report Type</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {reportData ? (
-                                <tr>
-                                    <td>{reportData.reportType}</td>
-                                    <td>{reportData.startDate}</td>
-                                    <td>{reportData.endDate}</td>
-                                    <td>
-                                        <button className="btn btn-primary" >View</button>
-                                    </td>
-                                </tr>
-                            ) : null}
 
-                        </tbody>
-                    </table>
                 </div>
             </main>
             <footer>

@@ -13,7 +13,7 @@ import {
     IconUser,
     IconLogout,
 } from '@tabler/icons-react';
-const CustomNavbar = () => {
+const EmpNavbar = () => {
     const navigate = useNavigate(); // Add useNavigate hook to access the navigation function
 
     const { logout } = UserAuth(); // Add logout function from the AuthContext
@@ -71,21 +71,25 @@ const CustomNavbar = () => {
                         >
                             <ul className="navbar-nav">
                                 <li className="nav-item">
-                                    <Text component={NavLink} to="/AdminUser"
-                                        className="nav-link text-white">User Management</Text>
+                                    <Text component={NavLink} to="/EmployeeProfile"
+                                        className="nav-link text-white">Employee Profile  </Text>
                                 </li>
                                 <li className="nav-item">
-                                    <Text component={NavLink} to="/AdminPerformance"
-                                        className="nav-link text-white">Performance Management</Text>
+                                    <Text component={NavLink} to="/employee"
+                                        className="nav-link text-white">Employee Profile Setting </Text>
+                                </li>
+
+
+                                <li className="nav-item">
+                                    <Text component={NavLink} to="/EmployeePerformance"
+                                        className="nav-link text-white">Performance Goals</Text>
                                 </li>
                                 <li className="nav-item">
-                                    <Text component={NavLink} to="/AdminCareerPath"
-                                        className="nav-link text-white">Carrer Pathing</Text>
+                                    <Text component={NavLink} to="/EmployeeHistory"
+                                        className="nav-link text-white">Performance History</Text>
                                 </li>
-                                <li className="nav-item">
-                                    <Text component={NavLink} to="/AdminReport"
-                                        className="nav-link text-white">Reporting</Text>
-                                </li>
+
+
                                 <li className="nav-item">
                                     <Button
                                         mt={2}
@@ -109,4 +113,4 @@ const CustomNavbar = () => {
     );
 };
 
-export default CustomNavbar;
+export default EmpNavbar;
