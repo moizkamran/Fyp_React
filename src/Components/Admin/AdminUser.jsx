@@ -23,34 +23,39 @@ const AdminUser = () => {
 
     useEffect(() => {
         const usersRef = ref(database, "Employees/Data");
-
+      
         const fetchData = () => {
-            onValue(usersRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    const userList = Object.values(data);
-                    setUserData(userList);
-
-                    // Store the user data in localStorage
-                    localStorage.setItem("userData", JSON.stringify(userList));
-                }
-            });
+          onValue(usersRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              const userList = Object.entries(data).map(([uid, user]) => ({
+                uid,
+                ...user,
+              }));
+              setUserData(userList);
+              console.log("User data fetched:", userList);
+      
+              // Store the user data in localStorage
+              localStorage.setItem("userData", JSON.stringify(userList));
+            }
+          });
         };
-
+      
         // Check if there is user data in localStorage
         const existingUserData = JSON.parse(localStorage.getItem("userData"));
         if (existingUserData && existingUserData.length > 0) {
-            setUserData(existingUserData);
+          setUserData(existingUserData);
         } else {
-            fetchData();
+          fetchData();
         }
-
+      
         // Clean up the listener when the component unmounts
         return () => {
-            // Detach the event listener
-            off(usersRef);
+          // Detach the event listener
+          off(usersRef);
         };
-    }, []);
+      }, []);
+      
 
     const rowsPerPage = 3;
     const [currentPage, setCurrentPage] = useState(1);
@@ -179,43 +184,36 @@ const AdminUser = () => {
         setEditRowIndex(-1);
     };
 
-    const handleDeleteUser = (index) => {
-        const userToDelete = displayedRows[index]; // Get the user object from displayedRows
-        const userToDeleteId = userToDelete.userId; // Retrieve the user's ID
-
-        // Find the corresponding index of the user within the original userData array
-        const originalIndex = userData.findIndex((user) => user.userId === userToDeleteId);
-
-        // Remove the user from the frontend by updating the userData state
-        setUserData((prevData) => {
-            const updatedUserData = [...prevData];
-            updatedUserData.splice(originalIndex, 1);
-            return updatedUserData;
-        });
-
-        // Remove the user from the database
+    const handleDeleteUser = (key) => {
+        const userToDeleteId = key;
+        console.log("User to delete:", userToDeleteId);
+      
         const userRef = ref(database, `Employees/Data/${userToDeleteId}`);
+        console.log("User ref:", userRef);
+      
         remove(userRef)
-            .then(() => {
-                console.log("User deleted successfully from the database");
-
-                // Remove the user from localStorage
-                let existingUserData = JSON.parse(localStorage.getItem("userData"));
-                if (!existingUserData) {
-                    existingUserData = [];
-                }
-                const updatedUserData = existingUserData.filter(
-                    (user) => user.userId !== userToDeleteId
-                );
-                localStorage.setItem("userData", JSON.stringify(updatedUserData));
-            })
-            .catch((error) => {
-                console.error("Error deleting user from the database:", error);
-            });
-
-        // Show a success message to the user
+          .then(() => {
+            console.log("User deleted successfully from the database");
+      
+            let existingUserData = JSON.parse(localStorage.getItem("userData"));
+            if (!existingUserData) {
+              existingUserData = [];
+            }
+            const updatedUserData = existingUserData.filter(
+              (user) => user.uid !== userToDeleteId
+            );
+            localStorage.setItem("userData", JSON.stringify(updatedUserData));
+      
+            setUserData(updatedUserData);
+          })
+          .catch((error) => {
+            console.error("Error deleting user from the database:", error);
+          });
+      
         toast.success("User deleted successfully");
-    };
+      };
+      
+      
 
 
     const renderPageNumbers = () => {
@@ -362,7 +360,7 @@ const AdminUser = () => {
                                                 <Button
                                                     size="sm"
                                                     className="btn btn-primary"
-                                                    onClick={() => handleDeleteUser(index)}
+                                                    onClick={() => handleDeleteUser(row.uid)}
                                                 >
                                                     Delete
                                                 </Button>
